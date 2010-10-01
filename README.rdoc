@@ -1,12 +1,32 @@
 = Quebert
 
-A pluggable worker queue framework in Ruby with support for async_send functionality in classes.
+async_observer is great, but is dated and doesn't really support running jobs outside of the async_send idiom. Quebert is an attempt to mix how jobs are run in other popular worker queue frameworks, like resque and dj, with async_observer so that you can have it both ways.
 
-== Running a worker
+A worker queue framework designed around Beanstalk. Features include:
 
-quebert my_cool_worker.rb --log-file 'super-awesome.log'
+* [x] Multiple back-ends (InProcess, Sync, and Beanstalk)
+* [ ] Pluggable exception handling (for Hoptoad integration)
+* [ ] Reliable daemonization with pidfile support
+* [ ] Rails/ActiveRecord integration similar to async_observer
 
+= License 
 
-== Copyright
+Copyright (c) 2010 Brad Gessler
 
-Copyright (c) 2010 Brad Gessler. See LICENSE for details.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
