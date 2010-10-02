@@ -5,9 +5,70 @@ async_observer is great, but is dated and doesn't really support running jobs ou
 A worker queue framework designed around Beanstalk. Features include:
 
 * [x] Multiple back-ends (InProcess, Sync, and Beanstalk)
-* [ ] Pluggable exception handling (for Hoptoad integration)
-* [ ] Reliable daemonization with pidfile support
-* [ ] Rails/ActiveRecord integration similar to async_observer
+* [x] Rails/ActiveRecord integration similar to async_observer
+* [x] Pluggable exception handling (for Hoptoad integration)
+* [x] Reliable daemonization with pidfile support
+
+= How to use
+
+== Jobs
+
+Quebert includes a Job class so you can implement how you want certain types of Jobs performed.
+    
+    Quebert.backend = Quebert::Backend::InProcess.new
+    
+    class WackyMathWizard < Quebert::Job
+      def perform(*nums)
+        nums.inject(0){|sum, n| sum = sum + n}
+      end
+    end
+
+You can either drop a job in a queue:
+
+    Quebert.backend.put WackyMathWizard, 1, 2, 3
+
+Or drop it in right from the job:
+
+    WackyMathWizard.enqueue 4, 5, 6
+
+Then perform the jobs!
+
+    Quebert.backend.reserve.perform # => 6
+    Quebert.backend.reserve.perform # => 15
+
+== Async Sender
+
+Take any ol' class and include the Quebert::AsyncSender.
+
+    Quebert.backend = Quebert::Backend::InProcess.new
+
+    class Greeter
+      include Quebert::AsyncSender
+      
+      def initialize(name)
+        @name = name
+      end
+      
+      def good(time_of_day)
+        "good #{time_of_day} #{@name}"
+      end
+    end
+    
+    walmart_greeter = Greeter.new("Brad")
+
+Remember the send method in ruby?
+
+    walmart_greeter.send(:howdy, "morning") # => "good morning brad"
+
+What if the method takes a long time to run and you want to queue it? async_send it!
+
+    walmart_greeter.async_send(:howdy, "morning")
+
+Quebert figures out how to *serialize the class, throw it on a worker queue, re-instantiate it on the other side, and finish up the work.
+
+    Quebert.backend.reserve.perform # => "good morning brad"
+
+* Only basic data types are included for serialization. Serializers may be customized to include support for different types.
 
 = License 
 
