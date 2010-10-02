@@ -4,6 +4,8 @@ async_observer is great, but is dated and doesn't really support running jobs ou
 
 A worker queue framework designed around Beanstalk. Features include:
 
+= Features
+
 * [x] Multiple back-ends (InProcess, Sync, and Beanstalk)
 * [x] Rails/ActiveRecord integration similar to async_observer
 * [x] Pluggable exception handling (for Hoptoad integration)
@@ -49,8 +51,13 @@ Take any ol' class and include the Quebert::AsyncSender.
         @name = name
       end
       
-      def good(time_of_day)
-        "good #{time_of_day} #{@name}"
+      def sleep_and_greet(time_of_day)
+        sleep 10000 # Sleeping, get it?
+        "Oh! Hi #{name}! Good #{time_of_day}."
+      end
+      
+      def self.budweiser_greeting(name)
+        "waaazup #{name}!"
       end
     end
     
@@ -58,15 +65,24 @@ Take any ol' class and include the Quebert::AsyncSender.
 
 Remember the send method in ruby?
 
-    walmart_greeter.send(:howdy, "morning") # => "good morning brad"
+    walmart_greeter.send(:sleep_and_greet, "morning")
+    # ... time passes, you wait as greeter snores obnoxiously ...
+    # => "Oh! Hi Brad! Good morning."
 
 What if the method takes a long time to run and you want to queue it? async_send it!
 
-    walmart_greeter.async_send(:howdy, "morning")
-
+    walmart_greeter.async_send(:sleep_and_greet, "morning")
+    # ... do some shopping and come back later when the dude wakes up
+    
 Quebert figures out how to *serialize the class, throw it on a worker queue, re-instantiate it on the other side, and finish up the work.
 
-    Quebert.backend.reserve.perform # => "good morning brad"
+    Quebert.backend.reserve.perform # => "Oh! Hi Brad! Good morning."
+    # ... Sorry dude! I'm shopping already
+    
+Does it work on Class methods? Yeah, that was easier than making instance methods work:
+
+    Quebert.async_send(:budweiser_greeting, "Corey")
+    Quebert.backend.reserve.perform # => "waazup Corey!"
 
 * Only basic data types are included for serialization. Serializers may be customized to include support for different types.
 
