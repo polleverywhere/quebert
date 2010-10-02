@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 describe Quebert::Job do
   
   before(:all) do
-    Adder.queue = @q = Quebert::Backend::InProcess.new
+    Adder.backend = @q = Quebert::Backend::InProcess.new
   end
 
   it "should raise not implemented on base job" do

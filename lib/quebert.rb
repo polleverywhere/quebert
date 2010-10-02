@@ -7,4 +7,9 @@ module Quebert
   autoload :Support,        'quebert/support'
   autoload :Worker,         'quebert/worker'
   autoload :Daemonizable,   'quebert/daemonizing'
+  autoload :AsyncSender,    'quebert/async_sender'
+  
+  def self.configuration
+    @configuration ||= Struct.new(:backend).new
+  end
 end

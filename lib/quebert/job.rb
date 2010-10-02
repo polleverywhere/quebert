@@ -21,7 +21,7 @@ module Quebert
     end
     
     def self.enqueue(*args)
-      queue.put(self, *args)
+      backend.put(self, *args)
     end
     
     def to_json
@@ -39,11 +39,11 @@ module Quebert
       end
     end
     
-    def self.queue=(queue)
-      @queue = queue
+    def self.backend=(backend)
+      @backend = backend
     end
-    def self.queue
-      @queue
+    def self.backend
+      @backend || Quebert.configuration.backend
     end
     
   protected

@@ -1,12 +1,11 @@
-require 'rubygems'
 require 'rake'
 
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "quebert"
-    gem.summary = %Q{TODO: one-line summary of your gem}
-    gem.description = %Q{TODO: longer description of your gem}
+    gem.summary = %Q{A worker queue framework built around beanstalkd}
+    gem.description = %Q{A worker queue framework built around beanstalkd}
     gem.email = "brad@bradgessler.com"
     gem.homepage = "http://github.com/bradgessler/quebert"
     gem.authors = ["Brad Gessler"]
