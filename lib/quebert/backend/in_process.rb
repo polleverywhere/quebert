@@ -7,7 +7,7 @@ module Quebert
       end
       
       def reserve
-        Consumer::Base.new(Job.from_json(pop))
+        json = pop and Consumer::Base.new(Job.from_json(json))
       end
     end
   end

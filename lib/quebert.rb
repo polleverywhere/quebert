@@ -5,4 +5,6 @@ module Quebert
   autoload :Consumer,       'quebert/consumer'
   autoload :Backend,        'quebert/backend'
   autoload :Support,        'quebert/support'
+  autoload :Worker,         'quebert/worker'
+  autoload :Daemonizable,   'quebert/daemonizing'
 end
