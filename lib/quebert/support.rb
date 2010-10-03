@@ -13,7 +13,16 @@ module Quebert
     end
     
     def self.symbolize_keys(hash)
-      hash.inject({}){|h, (k,v)| h[k.to_sym] = v; h; }
+      map_keys(hash, :to_sym)
+    end
+    
+    def self.stringify_keys(hash)
+      map_keys(hash, :to_s)
+    end
+    
+  private
+    def self.map_keys(hash, meth)
+      hash.inject({}){|h, (k,v)| h[k.send(meth)] = v; h; }
     end
   end
 end

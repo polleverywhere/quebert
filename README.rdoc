@@ -8,10 +8,14 @@ A worker queue framework designed around Beanstalk. Features include:
 
 * [x] Multiple back-ends (InProcess, Sync, and Beanstalk)
 * [x] Rails/ActiveRecord integration similar to async_observer
-* [x] Pluggable exception handling (for Hoptoad integration)
-* [x] Reliable daemonization with pidfile support
+* [ ] Pluggable exception handling (for Hoptoad integration)
+* [ ] Reliable daemonization with pidfile support
+
+[x] = Completed, [ ] = Not Started
 
 = How to use
+
+There are two ways to enqueue jobs with Quebert: through the Job itself, provided you set a default back-end for the job, or put it on the backend.
 
 == Jobs
 

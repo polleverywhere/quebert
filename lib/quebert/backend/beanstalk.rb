@@ -15,7 +15,7 @@ module Quebert
       alias :reserve_without_consumer :reserve
       alias :reserve :reserve_with_consumer
       
-      # For testing purposes.
+      # For testing purposes... I think there's a better way to do this though.
       def drain!
         while peek_ready do
           reserve_without_consumer.delete
@@ -26,6 +26,10 @@ module Quebert
         end
       end
       
+      def self.configure(opts={})
+        opts[:host] ||= '127.0.0.1:11300'
+        new(opts[:host], opts[:tube])
+      end
     end
   end
 end

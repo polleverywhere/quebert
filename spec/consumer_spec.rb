@@ -17,7 +17,7 @@ end
 
 describe Consumer::Beanstalk do
   before(:all) do
-    @q = Backend::Beanstalk.new(['localhost:11300'], 'quebert-test-jobs-actions')
+    @q = Backend::Beanstalk.configure(:host => 'localhost:11300', :tube => 'quebert-test-jobs-actions')
   end
   
   before(:each) do

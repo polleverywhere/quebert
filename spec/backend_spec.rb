@@ -1,5 +1,16 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
+describe Backend do
+  it "should have register backends" do
+    Quebert.backends.keys.should include(:in_process, :beanstalk, :sync)
+  end
+  
+  it "should register backends" do
+    Quebert::Backend.register :twenty, 20
+    Quebert.backends[:twenty].should eql(20)
+  end
+end
+
 describe Backend::InProcess do
   before(:all) do
     @q = Backend::InProcess.new
@@ -20,7 +31,7 @@ end
 
 describe Backend::Beanstalk  do
   before(:all) do
-    @q = Backend::Beanstalk.new(['localhost:11300'], 'quebert-test')
+    @q = Backend::Beanstalk.new('localhost:11300','quebert-test')
     @q.drain!
   end
   

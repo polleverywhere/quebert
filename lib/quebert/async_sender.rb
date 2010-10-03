@@ -1,29 +1,11 @@
 module Quebert
   module AsyncSender
     
-    module ActiveRecord
-      class RecordJob < Job
-        def perform(klass, id, meth, args)
-          Support.constantize(klass).find(id).send(meth, *args)
-        end
-      end
-      
-      def self.included(base)
-        base.send :include, InstanceMethods
-      end
-      
-      module InstanceMethods
-        def async_send(meth, *args)
-          RecordJob.enqueue(self.class.name, id, meth, args)
-        end
-      end
-    end
-    
     # Perform jobs on Object methods (not instances)
     module Object
       class ObjectJob < Job
         def perform(const, meth, args)
-          Support.constantize(const).send(meth, args)
+          Support.constantize(const).send(meth, *args)
         end
       end
       
@@ -42,14 +24,14 @@ module Quebert
     module Instance
       class InstanceJob < Job
         def perform(klass, init_args, meth, args)
-          Support.constantize(klass).new(init_args).send(meth, args)
+          Support.constantize(klass).new(init_args).send(meth, *args)
         end
       end
       
       def self.included(base)
         # Its not as simple as including initialize in a class, we
         # have to do some tricks to make it work so we can put the include
-        # before the initialize method as opposed to after
+        # before the initialize method as opposed to after. Ah, and thanks PivotalLabs for this.
         base.extend ClassMethods
         base.overwrite_initialize
         base.instance_eval do
@@ -94,5 +76,24 @@ module Quebert
       end
     end
     
-  end  
+    module ActiveRecord
+      class RecordJob < Job
+        def perform(klass, id, meth, args)
+          Support.constantize(klass).find(id).send(meth, *args)
+        end
+      end
+      
+      def self.included(base)
+        base.send :include, InstanceMethods
+        base.send :include, AsyncSender::Object
+      end
+      
+      module InstanceMethods
+        def async_send(meth, *args)
+          RecordJob.enqueue(self.class.name, id, meth, args)
+        end
+      end
+    end
+    
+  end
 end

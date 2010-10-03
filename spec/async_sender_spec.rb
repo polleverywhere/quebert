@@ -58,16 +58,28 @@ describe AsyncSender::ActiveRecord do
     def name
       "#{first_name} #{last_name}"
     end
+    
+    def self.email(address)
+      address
+    end
   end
   
   before(:all) do
     @q = Backend::InProcess.new
     Quebert::AsyncSender::ActiveRecord::RecordJob.backend = @q
+    Quebert::AsyncSender::Object::ObjectJob.backend = @q
+    
     @user = User.create!(:first_name => 'Brad', :last_name => 'Gessler', :email => 'brad@bradgessler.com')
   end
   
   it "should async_send instance method" do
     User.first.async_send(:name)
     @q.reserve.perform.should eql(User.first.name)
+  end
+  
+  it "should async_send class method" do
+    email = "brad@bradgessler.com"
+    User.async_send(:email, email)
+    @q.reserve.perform.should eql(email)
   end
 end
