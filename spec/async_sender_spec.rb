@@ -1,13 +1,17 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 require 'active_record'
 
-describe AsyncSender::Klass do
+describe AsyncSender::Class do
   
   before(:all) do
     @q = Backend::InProcess.new
+    Quebert::AsyncSender::Object::ObjectJob.backend = @q
+    Quebert::AsyncSender::Instance::InstanceJob.backend = @q
   end
   
   class Greeter
+    include AsyncSender::Class
+    
     def initialize(name)
       @name = name
     end
@@ -21,18 +25,12 @@ describe AsyncSender::Klass do
     end
   end
   
-  Greeter.send(:include, Quebert::AsyncSender::Klass)
-  
   it "should async send class methods" do
-    Quebert::AsyncSender::Klass::KlassJob.backend = @q
-    
     Greeter.async_send(:hi, 'Jeannette')
     @q.reserve.perform.should eql(Greeter.send(:hi, 'Jeannette'))
   end
   
   it "should async send instance methods" do
-    Quebert::AsyncSender::Klass::InstanceJob.backend = @q
-    
     Greeter.new("brad").async_send(:hi, 'stunning')
     @q.reserve.perform.should eql(Greeter.new("brad").send(:hi, 'stunning'))
   end
