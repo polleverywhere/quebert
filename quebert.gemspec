@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Brad Gessler"]
-  s.date = %q{2010-10-01}
+  s.date = %q{2010-10-03}
   s.description = %q{A worker queue framework built around beanstalkd}
   s.email = %q{brad@bradgessler.com}
   s.extra_rdoc_files = [
@@ -19,16 +19,18 @@ Gem::Specification.new do |s|
   s.files = [
     ".document",
      ".gitignore",
+     "Gemfile",
      "LICENSE",
      "README.rdoc",
      "Rakefile",
      "VERSION",
      "lib/quebert.rb",
-     "lib/quebert/async_send.rb",
+     "lib/quebert/async_sender.rb",
      "lib/quebert/backend.rb",
      "lib/quebert/backend/beanstalk.rb",
      "lib/quebert/backend/in_process.rb",
      "lib/quebert/backend/sync.rb",
+     "lib/quebert/configuration.rb",
      "lib/quebert/consumer.rb",
      "lib/quebert/consumer/base.rb",
      "lib/quebert/consumer/beanstalk.rb",
@@ -36,14 +38,17 @@ Gem::Specification.new do |s|
      "lib/quebert/job.rb",
      "lib/quebert/support.rb",
      "lib/quebert/worker.rb",
-     "spec/async_send_spec.rb",
+     "quebert.gemspec",
+     "spec/async_sender_spec.rb",
      "spec/backend_spec.rb",
+     "spec/configuration_spec.rb",
      "spec/consumer_spec.rb",
      "spec/job_spec.rb",
      "spec/jobs.rb",
      "spec/quebert_spec.rb",
      "spec/spec.opts",
-     "spec/spec_helper.rb"
+     "spec/spec_helper.rb",
+     "spec/worker_spec.rb"
   ]
   s.homepage = %q{http://github.com/bradgessler/quebert}
   s.rdoc_options = ["--charset=UTF-8"]
@@ -51,8 +56,9 @@ Gem::Specification.new do |s|
   s.rubygems_version = %q{1.3.7}
   s.summary = %q{A worker queue framework built around beanstalkd}
   s.test_files = [
-    "spec/async_send_spec.rb",
+    "spec/async_sender_spec.rb",
      "spec/backend_spec.rb",
+     "spec/configuration_spec.rb",
      "spec/consumer_spec.rb",
      "spec/job_spec.rb",
      "spec/jobs.rb",
