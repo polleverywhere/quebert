@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 describe Configuration do
   context "from hash" do
     before(:all) do
-      @config = Configuration.from_hash('backend' => 'beanstalk', 'host' => 'localhost:11300', 'tube' => 'quebert-config-test')
+      @config = Configuration.new.from_hash('backend' => 'beanstalk', 'host' => 'localhost:11300', 'tube' => 'quebert-config-test')
     end
     
     it "should configure backend" do

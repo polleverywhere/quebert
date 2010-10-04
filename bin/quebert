@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+
+begin
+  require "quebert"
+rescue LoadError
+  quebert_path = File.expand_path('../../lib/', __FILE__)
+  $:.unshift(quebert_path)
+  require 'rubygems'
+  require 'bundler/setup'
+  require 'quebert'
+end
+
+Quebert::CommandLineRunner.dispatch

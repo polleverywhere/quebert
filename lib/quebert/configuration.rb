@@ -1,16 +1,29 @@
+require 'logger'
+
 module Quebert
   class Configuration
-    attr_accessor :backend
+    attr_accessor :backend, :logger
     
-    def self.from_hash(hash)
-      hash, config = Support.symbolize_keys(hash), new
+    def logger
+      @logger ||= Logger.new($stdout)
+    end
+    
+    def log_file_path=(path)
+      self.logger = Logger.new(path)
+    end
+    
+    def from_hash(hash)
+      hash = Support.symbolize_keys(hash)
       # Find out backend from the registry and configure
       if backend = Quebert.backends[hash.delete(:backend).to_sym]
         # If the backend supports configuration, do it!
-        p backend
-        config.backend = backend.respond_to?(:configure) ? backend.configure(Support.symbolize_keys(hash)) : backend.new
+        self.backend = backend.respond_to?(:configure) ? backend.configure(Support.symbolize_keys(hash)) : backend.new
       end
-      config
+      self
+    end
+    
+    def self.from_hash(hash)
+      new.from_hash(hash) # Config this puppy up from a config hash
     end
   end
 end

@@ -1,7 +1,6 @@
 source :rubygems
 
 gem 'json'
-gem 'daemons'
 gem 'optitron'
 gem 'beanstalk-client'
 

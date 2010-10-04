@@ -6,8 +6,13 @@ describe Backend do
   end
   
   it "should register backends" do
-    Quebert::Backend.register :twenty, 20
+    Quebert.backends.register :twenty, 20
     Quebert.backends[:twenty].should eql(20)
+  end
+  
+  it "should unregister backends" do
+    Quebert.backends.unregister :twenty
+    Quebert.backends[:twenty].should be_nil
   end
 end
 

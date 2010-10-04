@@ -1,5 +1,9 @@
 module Quebert
   module Support
+    
+    autoload :PidFile,  'quebert/support/pid_file'
+    autoload :Registry, 'quebert/support/registry'
+    
     # Borrowed from Rails ActiveSupport
     def self.constantize(camel_cased_word) #:nodoc:
       names = camel_cased_word.split('::')

@@ -2,9 +2,7 @@ require 'logger'
 
 module Quebert
   class Worker
-    attr_accessor :exception_handler, :log_file, :backend
-    
-    include Quebert::Daemonizable
+    attr_accessor :exception_handler, :logger, :backend
     
     def initialize
       yield self if block_given?
@@ -12,18 +10,30 @@ module Quebert
     
     # Start the worker backend and intercept exceptions if a handler is provided
     def start
-      while job = backend.reserve do
+      logger.info "Worker pid##{Process.pid} started with #{backend.class.name} backend"
+      while consumer = backend.reserve do
         begin
-          job.perform
+          log consumer.job, "performing with args #{consumer.job.args.inspect}"
+          consumer.perform
+          log consumer.job, "complete"
         rescue Exception => e
+          log consumer.job, "fault #{e}", :error
           exception_handler ? exception_handler.call(e) : raise(e)
         end
       end
     end
     
   protected
-    def log(message)
-      puts message
+    def log(job, message, level=:info)
+      logger.send(level, "#{job.class.name}##{job.object_id}: #{message}")
+    end
+    
+    def logger
+      @logger ||= Quebert.logger
+    end
+    
+    def backend
+      @backend ||= Quebert.config.backend
     end
   end
 end

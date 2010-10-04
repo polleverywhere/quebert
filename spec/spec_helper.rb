@@ -7,10 +7,23 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'quebert'
 require 'spec'
 require 'spec/autorun'
+require 'logger'
 
 Spec::Runner.configure do |config|
 end
 
 include Quebert
+Quebert.config.logger = Logger.new('/dev/null') # Shhh...
 
 require 'jobs'
+
+def clean_file(path, contents=nil, &block)
+  FileUtils.remove_entry(path) if File.exists?(path)
+  FileUtils.mkdir_p(File.dirname(path))
+  begin
+    File.open(path, 'w'){|f| f.write(contents == :empty ? nil : contents) } unless contents.nil?
+    block.call
+  ensure
+    FileUtils.remove_entry(path) if File.exists?(path) and path != './'  # Yeah! This has happened before :(
+  end
+end
