@@ -2,7 +2,7 @@ require 'logger'
 
 module Quebert
   class Configuration
-    attr_accessor :backend, :logger
+    attr_accessor :backend, :logger, :worker
     
     def logger
       @logger ||= Logger.new($stdout)
@@ -20,6 +20,10 @@ module Quebert
         self.backend = backend.respond_to?(:configure) ? backend.configure(Support.symbolize_keys(hash)) : backend.new
       end
       self
+    end
+    
+    def worker
+      @worker ||= Struct.new(:exception_handler).new
     end
     
     def self.from_hash(hash)

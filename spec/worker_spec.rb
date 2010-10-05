@@ -17,6 +17,13 @@ describe Worker do
       @q.put Exceptional
       lambda{ @w.start }.should raise_exception
     end
+
+    it "should default to Quebert.config.worker.exception_handler handler" do
+      @q.put Exceptional
+      Quebert.config.worker.exception_handler = Proc.new{|e| e.should be_instance_of(Exception) }
+      @w.exception_handler = Proc.new{|e| e.should be_instance_of(Exception) }
+      lambda{ @w.start }.should_not raise_exception
+    end
     
     it "should intercept exceptions" do
       @q.put Exceptional
