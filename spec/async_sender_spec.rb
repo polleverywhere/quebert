@@ -59,27 +59,44 @@ describe AsyncSender::ActiveRecord do
       "#{first_name} #{last_name}"
     end
     
-    def self.email(address)
+    def self.emailizer(address)
       address
     end
   end
   
   before(:all) do
     @q = Backend::InProcess.new
-    Quebert::AsyncSender::ActiveRecord::RecordJob.backend = @q
+    Quebert::AsyncSender::ActiveRecord::PersistedRecordJob.backend = @q
+    Quebert::AsyncSender::ActiveRecord::UnpersistedRecordJob.backend = @q
     Quebert::AsyncSender::Object::ObjectJob.backend = @q
-    
-    @user = User.create!(:first_name => 'Brad', :last_name => 'Gessler', :email => 'brad@bradgessler.com')
   end
   
-  it "should async_send instance method" do
-    User.first.async_send(:name)
-    @q.reserve.perform.should eql(User.first.name)
+  context "persisted" do
+    before(:each) do
+      @user = User.create!(:first_name => 'Brad', :last_name => 'Gessler', :email => 'brad@bradgessler.com')
+    end
+    
+    it "should async_send instance method" do
+      User.first.async_send(:name)
+      @q.reserve.perform.should eql(User.first.name)
+    end
+  end
+  
+  context "unpersisted" do
+    it "should async_send instance method" do
+      user = User.new do |u|
+        u.email = 'barf@jones.com'
+        u.first_name = "Barf"
+        u.send(:write_attribute, :last_name, "Jones")
+      end
+      user.async_send(:name)
+      @q.reserve.perform.should eql("Barf Jones")
+    end
   end
   
   it "should async_send class method" do
     email = "brad@bradgessler.com"
-    User.async_send(:email, email)
+    User.async_send(:emailizer, email)
     @q.reserve.perform.should eql(email)
   end
 end
