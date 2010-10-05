@@ -11,7 +11,6 @@ begin
     gem.authors = ["Brad Gessler"]
     gem.add_development_dependency "rspec", ">= 1.2.9"
     gem.add_dependency "json"
-    gem.add_dependency "optitron"
     gem.add_dependency "beanstalk-client"
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end

@@ -9,7 +9,7 @@ describe CommandLineRunner do
     it "should write log file" do
       clean_file 'log.log' do
         lambda{
-          CommandLineRunner.dispatch(%w(worker --log-file=log.log))
+          CommandLineRunner.dispatch(%w(worker --log log.log))
         }.should change { File.read('log.log') if File.exists?('log.log') }
       end
     end
@@ -19,14 +19,14 @@ describe CommandLineRunner do
     it "should write pid" do
       clean_file 'pid.pid' do
         File.exists?('pid').should be_false
-        CommandLineRunner.dispatch(%w(worker --pid-file=pid.pid))
+        CommandLineRunner.dispatch(%w(worker --pid pid.pid))
         Support::PidFile.read('pid.pid').should eql(Process.pid)
       end
     end
     
     it "should remove stale" do
       clean_file 'pid.pid', "-1" do
-        CommandLineRunner.dispatch(%w(worker --pid-file=pid.pid))
+        CommandLineRunner.dispatch(%w(worker --pid pid.pid))
         Support::PidFile.read('pid.pid').should eql(Process.pid)
       end
     end
@@ -34,7 +34,7 @@ describe CommandLineRunner do
     it "should complain if the pid is already running" do
       clean_file 'pid.pid', Process.pid do
         lambda{
-          CommandLineRunner.dispatch(%w(worker --pid-file=pid.pid))
+          CommandLineRunner.dispatch(%w(worker --pid pid.pid))
         }.should raise_exception(Support::PidFile::ProcessRunning)
         Support::PidFile.read('pid.pid').should eql(Process.pid)
       end
@@ -53,7 +53,7 @@ describe CommandLineRunner do
     it "should run config file" do
       clean_file './super_awesome.rb', "raise 'SuperAwesome'" do
         lambda{
-          CommandLineRunner.dispatch(%w(worker --config-file=super_awesome.rb))
+          CommandLineRunner.dispatch(%w(worker --config super_awesome.rb))
         }.should raise_exception('SuperAwesome')
       end
     end
@@ -66,7 +66,7 @@ describe CommandLineRunner do
     end
     
     it "should change chdir" do
-      CommandLineRunner.dispatch(%w(worker --chdir=/))
+      CommandLineRunner.dispatch(%w(worker --chdir /))
       Dir.pwd.should eql('/')
     end
     

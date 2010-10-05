@@ -1,7 +1,6 @@
 source :rubygems
 
 gem 'json'
-gem 'optitron'
 gem 'beanstalk-client'
 
 group :test do
