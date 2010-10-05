@@ -12,7 +12,7 @@ module Quebert
       # Serialize an unpersisted AR with the attributes on the thing.
       class UnpersistedRecordJob < Job
         def perform(model_name, attrs, meth, args)
-          self.class.deserialize(Support.constantize(model_name), attrs).send(meth, *args)
+          self.class.deserialize(Support.constantize(model_name).new, attrs).send(meth, *args)
         end
         
         # Deal with converting an AR to/from a hash that we can send over the wire.
@@ -23,8 +23,7 @@ module Quebert
           end
         end
         
-        def self.deserialize(model, attrs)
-          record = model.new
+        def self.deserialize(record, attrs)
           record.attributes.each do |attr, val|
             record.send("#{attr}=", attrs[attr])
           end
