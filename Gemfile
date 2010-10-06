@@ -9,4 +9,5 @@ group :test do
   gem 'ruby-debug'
   gem 'activerecord'
   gem 'sqlite3-ruby'
+  gem 'autotest-fsevent'
 end

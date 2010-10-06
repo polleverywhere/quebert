@@ -11,7 +11,7 @@ module Quebert
       
       def perform
         begin
-          result = job.perform(*job.args)
+          result = job.send(:perform!)
           beanstalk_job.delete
           result
         rescue Job::Delete

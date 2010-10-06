@@ -6,6 +6,14 @@ describe Quebert::Job do
     Adder.backend = @q = Quebert::Backend::InProcess.new
   end
 
+  it "should perform!" do
+    Adder.new(1,2,3).perform!.should eql(6)
+  end
+  
+  it "should perform 0 arg jobs" do
+    Adder.new.perform!.should eql(0)
+  end
+  
   it "should raise not implemented on base job" do
     lambda {
       Job.new.perform
@@ -14,7 +22,7 @@ describe Quebert::Job do
   
   it "should convert job to and from JSON" do
     args = [1,2,3]
-    serialized = Adder.new(args).to_json
+    serialized = Adder.new(*args).to_json
     unserialized = Adder.from_json(serialized)
     unserialized.should be_instance_of(Adder)
     unserialized.args.should eql(args)
@@ -44,7 +52,7 @@ describe Quebert::Job do
   context "job queue" do
     it "should enqueue" do
       lambda{
-        Adder.enqueue(1,2,3)
+        Adder.new(1,2,3).enqueue
       }.should change(@q, :size).by(1)
     end
   end

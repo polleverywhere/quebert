@@ -5,8 +5,8 @@ module Quebert
     
     # Manage jobs on a Beanstalk queue out of process
     class Beanstalk < Beanstalk::Pool
-      def put(job, *args)
-        super Job.to_json(job, *args)
+      def put(job)
+        super job.to_json
       end
       
       def reserve_with_consumer

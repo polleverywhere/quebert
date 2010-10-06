@@ -1,10 +1,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
-require 'active_record'
 
 describe AsyncSender::Class do
   
   before(:all) do
-    @q = Backend::InProcess.new
+    @q = Quebert::Backend::InProcess.new
     Quebert::AsyncSender::Object::ObjectJob.backend = @q
     Quebert::AsyncSender::Instance::InstanceJob.backend = @q
   end
@@ -39,36 +38,16 @@ end
 
 describe AsyncSender::ActiveRecord do
   
-  ActiveRecord::Base.establish_connection({
-    :adapter => 'sqlite3',
-    :database => ':memory:'
-  })
-  
-  ActiveRecord::Schema.define do
-    create_table "users", :force => true do |t|
-      t.column "first_name",  :text
-      t.column "last_name",  :text
-      t.column "email", :text
-    end
-  end
-  
-  class User < ActiveRecord::Base
-    include Quebert::AsyncSender::ActiveRecord
-    
-    def name
-      "#{first_name} #{last_name}"
-    end
-    
-    def self.emailizer(address)
-      address
-    end
-  end
-  
   before(:all) do
+    Quebert.serializers.register :'ActiveRecord::Base', Serializer::ActiveRecord
+    
     @q = Backend::InProcess.new
-    Quebert::AsyncSender::ActiveRecord::PersistedRecordJob.backend = @q
-    Quebert::AsyncSender::ActiveRecord::UnpersistedRecordJob.backend = @q
+    Quebert::AsyncSender::ActiveRecord::RecordJob.backend = @q
     Quebert::AsyncSender::Object::ObjectJob.backend = @q
+  end
+  
+  after(:all) do
+    Quebert.serializers.unregister :'ActiveRecord::Base'
   end
   
   context "persisted" do
@@ -99,4 +78,5 @@ describe AsyncSender::ActiveRecord do
     User.async_send(:emailizer, email)
     @q.reserve.perform.should eql(email)
   end
+  
 end

@@ -6,9 +6,9 @@ module Quebert
     
     # Borrowed from Rails ActiveSupport
     def self.constantize(camel_cased_word) #:nodoc:
-      names = camel_cased_word.split('::')
+      names = camel_cased_word.to_s.split('::')
       names.shift if names.empty? || names.first.empty?
-
+      
       constant = Object
       names.each do |name|
         constant = constant.const_defined?(name) ? constant.const_get(name) : constant.const_missing(name)

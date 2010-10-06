@@ -23,7 +23,7 @@ describe Backend::InProcess do
   
   it "should put on queue" do
     3.times do |num|
-      @q.put Adder, num
+      @q.put Adder.new(num)
     end
   end
   
@@ -42,7 +42,7 @@ describe Backend::Beanstalk  do
   
   it "should put on queue" do
     3.times do |num|
-      @q.put Adder, num
+      @q.put Adder.new(num)
     end
   end
   
@@ -53,7 +53,6 @@ describe Backend::Beanstalk  do
   end
 end
 
-
 describe Backend::Sync do
   before(:all) do
     @q = Backend::Sync.new
@@ -61,7 +60,7 @@ describe Backend::Sync do
   
   it "should put on queue" do
     3.times do |num|
-      @q.put(Adder, num).should eql(num)
+      @q.put(Adder.new(num)).should eql(num)
     end
   end
   

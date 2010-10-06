@@ -3,7 +3,7 @@ require 'ruby-debug'
 
 describe Consumer::Base do
   it "should perform job" do
-    Consumer::Base.new(Adder.new([1,2])).perform.should eql(3)
+    Consumer::Base.new(Adder.new(1,2)).perform.should eql(3)
   end
   
   it "should rescue all raised job actions" do
@@ -25,14 +25,14 @@ describe Consumer::Beanstalk do
   end
   
   it "should delete job off queue after succesful run" do
-    @q.put(Adder, 1, 2)
+    @q.put Adder.new(1, 2)
     @q.peek_ready.should_not be_nil
     @q.reserve.perform.should eql(3)
     @q.peek_ready.should be_nil
   end
   
   it "should bury job if an exception occurs in job" do
-    @q.put Exceptional
+    @q.put Exceptional.new
     @q.peek_ready.should_not be_nil
     lambda{ @q.reserve.perform }.should raise_exception
     @q.peek_buried.should_not be_nil
@@ -40,21 +40,21 @@ describe Consumer::Beanstalk do
   
   context "job actions" do
     it "should delete job" do
-      @q.put DeleteJob
+      @q.put DeleteJob.new
       @q.peek_ready.should_not be_nil
       @q.reserve.perform
       @q.peek_ready.should be_nil
     end
     
     it "should release job" do
-      @q.put ReleaseJob
+      @q.put ReleaseJob.new
       @q.peek_ready.should_not be_nil
       @q.reserve.perform
       @q.peek_ready.should_not be_nil
     end
     
     it "should bury job" do
-      @q.put BuryJob
+      @q.put BuryJob.new
       @q.peek_ready.should_not be_nil
       @q.peek_buried.should be_nil
       @q.reserve.perform

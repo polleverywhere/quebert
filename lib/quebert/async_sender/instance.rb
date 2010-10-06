@@ -44,7 +44,7 @@ module Quebert
       end
       
       def async_send(meth, *args)
-        InstanceJob.enqueue(self.class.name, @_init_args, meth, args)
+        InstanceJob.new(self.class.name, @_init_args, meth, args).enqueue
       end
     end
   end

@@ -11,7 +11,7 @@ module Quebert
       
       def perform
         begin
-          job.perform(*job.args)
+          job.send(:perform!)
         rescue Job::Action
           # Nothing to do chief!
         end

@@ -14,7 +14,7 @@ module Quebert
       
       module ClassMethods
         def async_send(meth, *args)
-          ObjectJob.enqueue(self.name, meth, args)
+          ObjectJob.new(self.name, meth, args).enqueue
         end
       end
     end

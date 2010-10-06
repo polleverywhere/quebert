@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{quebert}
-  s.version = "0.0.4"
+  s.version = "0.0.5"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Brad Gessler"]
-  s.date = %q{2010-10-05}
+  s.date = %q{2010-10-06}
   s.default_executable = %q{quebert}
   s.description = %q{A worker queue framework built around beanstalkd}
   s.email = %q{brad@bradgessler.com}
@@ -43,6 +43,7 @@ Gem::Specification.new do |s|
      "lib/quebert/consumer/base.rb",
      "lib/quebert/consumer/beanstalk.rb",
      "lib/quebert/job.rb",
+     "lib/quebert/serializer.rb",
      "lib/quebert/support.rb",
      "lib/quebert/support/pid_file.rb",
      "lib/quebert/support/registry.rb",
@@ -54,10 +55,13 @@ Gem::Specification.new do |s|
      "spec/configuration_spec.rb",
      "spec/consumer_spec.rb",
      "spec/job_spec.rb",
-     "spec/jobs.rb",
      "spec/quebert_spec.rb",
+     "spec/serializer_spec.rb",
      "spec/spec.opts",
      "spec/spec_helper.rb",
+     "spec/support/active_record.rb",
+     "spec/support/jobs.rb",
+     "spec/support_spec.rb",
      "spec/worker_spec.rb"
   ]
   s.homepage = %q{http://github.com/bradgessler/quebert}
@@ -72,9 +76,12 @@ Gem::Specification.new do |s|
      "spec/configuration_spec.rb",
      "spec/consumer_spec.rb",
      "spec/job_spec.rb",
-     "spec/jobs.rb",
      "spec/quebert_spec.rb",
+     "spec/serializer_spec.rb",
      "spec/spec_helper.rb",
+     "spec/support/active_record.rb",
+     "spec/support/jobs.rb",
+     "spec/support_spec.rb",
      "spec/worker_spec.rb"
   ]
 

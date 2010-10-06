@@ -6,12 +6,15 @@ A worker queue framework designed around Beanstalk. Features include:
 
 = Features
 
-* [x] Multiple back-ends (InProcess, Sync, and Beanstalk)
-* [ ] Rails/ActiveRecord integration similar to async_observer
-* [ ] Pluggable exception handling (for Hoptoad integration)
-* [ ] Reliable daemonization with pidfile support
+* Multiple back-ends (InProcess, Sync, and Beanstalk)
+* Rails/ActiveRecord integration similar to async_observer
+* Pluggable exception handling (for Hoptoad integration)
+* Run workers with pid, log, and config files. These do not daemonize (do it yourself punk!)
 
-  [x] = Completed, [ ] = Not Started
+Some features that are currently missing that I will soon add include:
+
+* Rails plugin support (The AR integrations have to be done manually today)
+* Auto-detecting serializers. Enhanced ClassRegistry to more efficiently look up serializers for objects.
 
 = How to use
 
@@ -31,11 +34,11 @@ Quebert includes a Job class so you can implement how you want certain types of 
 
 You can either drop a job in a queue:
 
-    Quebert.backend.put WackyMathWizard, 1, 2, 3
+    Quebert.backend.put WackyMathWizard.new(1, 2, 3)
 
 Or drop it in right from the job:
 
-    WackyMathWizard.enqueue 4, 5, 6
+    WackyMathWizard.new(4, 5, 6).enqueue
 
 Then perform the jobs!
 

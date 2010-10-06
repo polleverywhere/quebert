@@ -12,7 +12,7 @@ module Quebert
     Delete  = Class.new(Action)
     Release = Class.new(Action)
     
-    def initialize(args=[])
+    def initialize(*args)
       @args = args.dup.freeze
     end
     
@@ -20,22 +20,22 @@ module Quebert
       raise NotImplemented
     end
     
-    def self.enqueue(*args)
-      backend.put(self, *args)
+    # Runs the perform method that somebody else should be implementing
+    def perform!
+      perform(*args)
+    end
+    
+    def enqueue
+      self.class.backend.put self
     end
     
     def to_json
-      self.class.to_json(self)
-    end
-    
-    def self.to_json(job, *args)
-      args, job = job.args, job.class if job.respond_to?(:args)
-      JSON.generate('job' => job.name, 'args' => args)
+      JSON.generate(Serializer::Job.serialize(self))
     end
     
     def self.from_json(json)
-      if data = JSON.parse(json)
-        Support.constantize(data['job']).new(data['args'])
+      if hash = JSON.parse(json) and not hash.empty?
+        Serializer::Job.deserialize(hash)
       end
     end
     
