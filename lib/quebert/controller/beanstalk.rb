@@ -1,5 +1,5 @@
 module Quebert
-  module Consumer
+  module Controller
     # Handle interactions between a job and a Beanstalk queue.
     class Beanstalk < Base
       attr_reader :beanstalk_job, :queue, :job
@@ -11,7 +11,7 @@ module Quebert
       
       def perform
         begin
-          result = job.send(:perform!)
+          result = job.perform!
           beanstalk_job.delete
           result
         rescue Job::Delete

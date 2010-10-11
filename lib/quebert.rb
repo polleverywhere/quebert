@@ -2,7 +2,7 @@ module Quebert
   autoload :Serializer,         'quebert/serializer'
   autoload :Configuration,      'quebert/configuration'
   autoload :Job,                'quebert/job'
-  autoload :Consumer,           'quebert/consumer'
+  autoload :Controller,         'quebert/controller'
   autoload :Backend,            'quebert/backend'
   autoload :Support,            'quebert/support'
   autoload :Worker,             'quebert/worker'

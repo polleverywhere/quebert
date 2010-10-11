@@ -1,6 +1,6 @@
 module Quebert
-  module Consumer
-    # The most Consumer. Doesn't even accept the queue as an argument because there's nothing
+  module Controller
+    # The most Controller. Doesn't even accept the queue as an argument because there's nothing
     # a job can do to be rescheduled, etc.
     class Base
       attr_reader :job
@@ -11,7 +11,7 @@ module Quebert
       
       def perform
         begin
-          job.send(:perform!)
+          job.perform!
         rescue Job::Action
           # Nothing to do chief!
         end

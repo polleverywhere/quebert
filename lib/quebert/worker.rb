@@ -10,17 +10,24 @@ module Quebert
     
     # Start the worker backend and intercept exceptions if a handler is provided
     def start
+      Signal.trap('TERM'){ stop }
+      
       logger.info "Worker pid##{Process.pid} started with #{backend.class.name} backend"
-      while consumer = backend.reserve do
+      while controller = backend.reserve do
         begin
-          log consumer.job, "performing with args #{consumer.job.args.inspect}"
-          consumer.perform
-          log consumer.job, "complete"
+          log controller.job, "performing with args #{controller.job.args.inspect}"
+          controller.perform
+          log controller.job, "complete"
         rescue Exception => e
-          log consumer.job, "fault #{e}", :error
+          log controller.job, "fault #{e}", :error
           exception_handler ? exception_handler.call(e) : raise(e)
         end
       end
+    end
+    
+    def stop
+      logger.info "Worker pid##{Process.pid} stopping"
+      exit 0
     end
     
   protected

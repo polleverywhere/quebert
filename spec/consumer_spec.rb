@@ -1,21 +1,21 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 require 'ruby-debug'
 
-describe Consumer::Base do
+describe Controller::Base do
   it "should perform job" do
-    Consumer::Base.new(Adder.new(1,2)).perform.should eql(3)
+    Controller::Base.new(Adder.new(1,2)).perform.should eql(3)
   end
   
   it "should rescue all raised job actions" do
     [ReleaseJob, DeleteJob, BuryJob].each do |job|
       lambda{
-        Consumer::Base.new(job.new).perform
+        Controller::Base.new(job.new).perform
       }.should_not raise_exception
     end
   end
 end
 
-describe Consumer::Beanstalk do
+describe Controller::Beanstalk do
   before(:all) do
     @q = Backend::Beanstalk.configure(:host => 'localhost:11300', :tube => 'quebert-test-jobs-actions')
   end

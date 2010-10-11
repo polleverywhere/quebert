@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{quebert}
-  s.version = "0.0.5"
+  s.version = "0.0.6"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Brad Gessler"]
-  s.date = %q{2010-10-06}
+  s.date = %q{2010-10-11}
   s.default_executable = %q{quebert}
   s.description = %q{A worker queue framework built around beanstalkd}
   s.email = %q{brad@bradgessler.com}
@@ -39,9 +39,9 @@ Gem::Specification.new do |s|
      "lib/quebert/backend/sync.rb",
      "lib/quebert/command_line_runner.rb",
      "lib/quebert/configuration.rb",
-     "lib/quebert/consumer.rb",
-     "lib/quebert/consumer/base.rb",
-     "lib/quebert/consumer/beanstalk.rb",
+     "lib/quebert/controller.rb",
+     "lib/quebert/controller/base.rb",
+     "lib/quebert/controller/beanstalk.rb",
      "lib/quebert/job.rb",
      "lib/quebert/serializer.rb",
      "lib/quebert/support.rb",
