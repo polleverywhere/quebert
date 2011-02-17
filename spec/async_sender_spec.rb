@@ -79,4 +79,10 @@ describe AsyncSender::ActiveRecord do
     @q.reserve.perform.should eql(email)
   end
   
+  it "should async_send and successfully serialize param object" do
+    user = User.new(:first_name => 'Brad')
+    user2 = User.new(:first_name => 'Steel')
+    user.async_send(:email, user2)
+    @q.reserve.perform.first_name.should eql('Steel')
+  end
 end

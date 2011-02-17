@@ -23,4 +23,8 @@ class User < ActiveRecord::Base
   def self.emailizer(address)
     address
   end
+
+  def email(address)
+    address
+  end
 end
