@@ -4,10 +4,10 @@ gem 'json'
 gem 'beanstalk-client'
 
 group :test do
-  gem 'rspec'
+  gem 'rspec',                    '1.3.0',        :require => nil
   gem 'ZenTest'
   gem 'ruby-debug'
-  gem 'activerecord'
+  gem 'activerecord',             '2.3.5'
   gem 'sqlite3-ruby'
   gem 'autotest-fsevent'
 end
