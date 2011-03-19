@@ -3,7 +3,7 @@ module Quebert
     # Perform jobs on instances of classes
     module Instance
       class InstanceJob < Job
-        def perform(klass, init_args, meth, args)
+        def perform(klass, init_args, meth, *args)
           Support.constantize(klass).new(init_args).send(meth, *args)
         end
       end
@@ -44,7 +44,7 @@ module Quebert
       end
       
       def async_send(meth, *args)
-        InstanceJob.new(self.class.name, @_init_args, meth, args).enqueue
+        InstanceJob.new(self.class.name, @_init_args, meth, *args).enqueue
       end
     end
   end

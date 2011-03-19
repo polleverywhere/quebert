@@ -16,7 +16,7 @@ module Quebert
       while controller = backend.reserve do
         begin
           log controller.job, "performing with args #{controller.job.args.inspect}."
-          log controller.job, "Priority: #{controller.beanstalk_job.priority}, Delay: #{controller.beanstalk_job.delay}, TTR: #{controller.beanstalk_job.ttr}" if controller.is_a?(Beanstalk)
+          log controller.job, "Priority: #{controller.beanstalk_job.pri}, Delay: #{controller.beanstalk_job.delay}, TTR: #{controller.beanstalk_job.ttr}" if controller.respond_to?(:beanstalk_job)
           controller.perform
           log controller.job, "complete"
         rescue Exception => e

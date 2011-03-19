@@ -70,11 +70,19 @@ describe Quebert::Job do
 
       it "should enqueue and honor beanstalk options" do
         user = User.new(:first_name => "Steel")
-        user.async_send(:email, "somebody", :beanstalk => {:priority => 1, :delay => 2, :ttr => 3})
+        user.async_send(:email, "somebody", nil, nil, :beanstalk => {:priority => 1, :delay => 2, :ttr => 300})
         job = @q.reserve
         job.beanstalk_job.pri.should eql(1)
         job.beanstalk_job.delay.should eql(2)
-        job.beanstalk_job.ttr.should eql(3)
+        job.beanstalk_job.ttr.should eql(300)
+      end
+
+      it "should enqueue and honor beanstalk options" do
+        User.async_send(:emailizer, "somebody", nil, nil, :beanstalk => {:priority => 1, :delay => 2, :ttr => 300})
+        job = @q.reserve
+        job.beanstalk_job.pri.should eql(1)
+        job.beanstalk_job.delay.should eql(2)
+        job.beanstalk_job.ttr.should eql(300)
       end
     end
   end  
