@@ -40,7 +40,7 @@ end
 
 describe Serializer::Job do
   before(:all) do
-    @args = [100, User.new(:first_name => 'Brad')]
+    @args = [100, User.new(:first_name => 'Brad'), {:beanstalk => {:priority => 1, :delay => 2, :ttr => 3}}]
     @job = Job.new(*@args)
   end
   
@@ -50,11 +50,17 @@ describe Serializer::Job do
     h['args'][0]['payload'].should eql(100)
     h['args'][1]['payload'].should eql(Serializer::ActiveRecord.serialize(@args[1]))
     h['args'][1]['serializer'].should eql('Quebert::Serializer::ActiveRecord')
+    h['priority'].should eql(1)
+    h['delay'].should eql(2)
+    h['ttr'].should eql(3)
   end
   
   it "should deserialize job" do
     job = Serializer::Job.deserialize(Serializer::Job.serialize(@job))
     job.args[0].should eql(100)
     job.args[1].first_name.should eql('Brad')
+    job.delay.should eql(2)
+    job.priority.should eql(1)
+    job.ttr.should eql(3)
   end
 end

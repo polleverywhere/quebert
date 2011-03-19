@@ -55,6 +55,27 @@ describe Quebert::Job do
         Adder.new(1,2,3).enqueue
       }.should change(@q, :size).by(1)
     end
-  end
-  
+
+    context "beanstalk backend" do
+      before(:all) do
+        Quebert.serializers.register 'ActiveRecord::Base', Serializer::ActiveRecord
+
+        @q = Backend::Beanstalk.new('localhost:11300','quebert-test')
+
+        Quebert::AsyncSender::ActiveRecord::RecordJob.backend = @q
+        Quebert::AsyncSender::Object::ObjectJob.backend = @q
+
+        @q.drain!
+      end
+
+      it "should enqueue and honor beanstalk options" do
+        user = User.new(:first_name => "Steel")
+        user.async_send(:email, "somebody", :beanstalk => {:priority => 1, :delay => 2, :ttr => 3})
+        job = @q.reserve
+        job.beanstalk_job.pri.should eql(1)
+        job.beanstalk_job.delay.should eql(2)
+        job.beanstalk_job.ttr.should eql(3)
+      end
+    end
+  end  
 end

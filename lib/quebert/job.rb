@@ -3,6 +3,7 @@ require 'json'
 module Quebert
   class Job
     attr_reader :args
+    attr_accessor :priority, :delay, :ttr
     
     NotImplemented = Class.new(StandardError)
     
@@ -13,6 +14,14 @@ module Quebert
     Release = Class.new(Action)
     
     def initialize(*args)
+      opts = args.last.is_a?(::Hash) ? args.pop : nil
+      
+      if opts
+        beanstalk_opts = opts.delete(:beanstalk)
+        args << opts unless opts.empty?
+        @priority, @delay, @ttr = beanstalk_opts[:priority], beanstalk_opts[:delay], beanstalk_opts[:ttr] if beanstalk_opts
+      end
+
       @args = args.dup.freeze
     end
     
@@ -26,7 +35,7 @@ module Quebert
     end
     
     def enqueue
-      self.class.backend.put self
+      self.class.backend.put self, @priority, @delay, @ttr
     end
     
     def to_json

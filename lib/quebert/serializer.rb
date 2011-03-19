@@ -6,13 +6,20 @@ module Quebert
       def self.serialize(job)
         {
           'job' => job.class.name,
-          'args' => serialize_args(job.args)
+          'args' => serialize_args(job.args),
+          'priority' => job.priority,
+          'delay' => job.delay,
+          'ttr' => job.ttr
         }
       end
       
       def self.deserialize(hash)
         hash = Support.stringify_keys(hash)
-        Support.constantize(hash['job']).new(*deserialize_args(hash['args']))
+        job = Support.constantize(hash['job']).new(*deserialize_args(hash['args']))
+        job.priority = hash['priority']
+        job.delay = hash['delay']
+        job.ttr = hash['ttr']
+        job
       end
       
     private

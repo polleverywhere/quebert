@@ -2,7 +2,7 @@ module Quebert
   module Backend
     # Drops jobs on an array in-process.
     class InProcess < Array
-      def put(job)
+      def put(job, *args)
         unshift job.to_json
       end
       
