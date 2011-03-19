@@ -5,6 +5,10 @@ module Quebert
     attr_reader :args
     attr_accessor :priority, :delay, :ttr
     
+    DEFAULT_JOB_PRIORITY = 65536
+    DEFAULT_JOB_DELAY = 0
+    DEFAULT_JOB_TTR = 120
+
     NotImplemented = Class.new(StandardError)
     
     Action  = Class.new(Exception)
@@ -16,10 +20,19 @@ module Quebert
     def initialize(*args)
       opts = args.last.is_a?(::Hash) ? args.pop : nil
       
+      @priority = DEFAULT_JOB_PRIORITY
+      @delay = DEFAULT_JOB_DELAY
+      @ttr = DEFAULT_JOB_TTR
+
       if opts
         beanstalk_opts = opts.delete(:beanstalk)
         args << opts unless opts.empty?
-        @priority, @delay, @ttr = beanstalk_opts[:priority], beanstalk_opts[:delay], beanstalk_opts[:ttr] if beanstalk_opts
+        
+        if beanstalk_opts
+          @priority = beanstalk_opts[:priority] if beanstalk_opts[:priority]
+          @delay = beanstalk_opts[:delay] if beanstalk_opts[:delay]
+          @ttr = beanstalk_opts[:ttr] if beanstalk_opts[:ttr]
+        end
       end
 
       @args = args.dup.freeze
