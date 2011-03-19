@@ -15,7 +15,8 @@ module Quebert
       logger.info "Worker pid##{Process.pid} started with #{backend.class.name} backend"
       while controller = backend.reserve do
         begin
-          log controller.job, "performing with args #{controller.job.args.inspect}"
+          log controller.job, "performing with args #{controller.job.args.inspect}."
+          log controller.job, "Priority: #{controller.beanstalk_job.priority}, Delay: #{controller.beanstalk_job.delay}, TTR: #{controller.beanstalk_job.ttr}" if controller.is_a?(Beanstalk)
           controller.perform
           log controller.job, "complete"
         rescue Exception => e
