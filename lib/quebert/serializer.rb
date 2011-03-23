@@ -65,7 +65,7 @@ module Quebert
         hash = Support.stringify_keys(hash)
         model = Support.constantize(hash.delete('model'))
         if attrs = Support.stringify_keys(hash.delete('attributes'))
-          if id = hash.delete('id')
+          if id = attrs.delete('id')
             # This has been persisited, so just find it from the db
             model.find(id)
           else

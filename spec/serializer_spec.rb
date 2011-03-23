@@ -16,6 +16,7 @@ describe Serializer::ActiveRecord do
     it "should deserialize" do
       u = Serializer::ActiveRecord.deserialize(Serializer::ActiveRecord.serialize(@user))
       u.first_name.should eql('Tom')
+      u.id.should eql(@user.id)
     end
   end
   
