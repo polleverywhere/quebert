@@ -38,6 +38,15 @@ describe Controller::Beanstalk do
     @q.peek_buried.should_not be_nil
   end
   
+  it "should bury an AR job if an exception occurs deserializing it" do
+    @user = User.new(:first_name => "John", :last_name => "Doe", :email => "jdoe@gmail.com")
+    @user.id = 1
+    @q.put Serializer::ActiveRecord.serialize(@user)
+    @q.peek_ready.should_not be_nil
+    lambda{ @q.reserve.perform }.should raise_exception
+    @q.peek_buried.should_not be_nil
+  end
+
   context "job actions" do
     it "should delete job" do
       @q.put DeleteJob.new

@@ -6,7 +6,19 @@ module Quebert
       
       def initialize(beanstalk_job, queue)
         @beanstalk_job, @queue = beanstalk_job, queue
-        @job = Job.from_json(beanstalk_job.body)
+
+        begin
+          @job = Job.from_json(beanstalk_job.body)
+        rescue Job::Delete
+          beanstalk_job.delete
+        rescue Job::Release
+          beanstalk_job.release
+        rescue Job::Bury
+          beanstalk_job.bury
+        rescue Exception => e
+          beanstalk_job.bury
+          raise e  
+        end
       end
       
       def perform
