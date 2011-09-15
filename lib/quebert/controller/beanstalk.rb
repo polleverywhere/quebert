@@ -12,7 +12,7 @@ module Quebert
         rescue Job::Delete
           beanstalk_job.delete
         rescue Job::Release
-          beanstalk_job.release
+          beanstalk_job.release nil, @job.delay
         rescue Job::Bury
           beanstalk_job.bury
         rescue Exception => e
@@ -29,7 +29,7 @@ module Quebert
         rescue Job::Delete
           beanstalk_job.delete
         rescue Job::Release
-          beanstalk_job.release
+          beanstalk_job.release nil, @job.delay
         rescue Job::Bury
           beanstalk_job.bury
         rescue Exception => e
