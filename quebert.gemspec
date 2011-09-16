@@ -5,9 +5,9 @@ require "quebert/version"
 Gem::Specification.new do |s|
   s.name        = "quebert"
   s.version     = Quebert::VERSION
-  s.authors     = ["Brad Gessler"]
+  s.authors     = ["Brad Gessler", "Steel Fu", "Jeff Vyduna"]
   s.email       = ["brad@bradgessler.com"]
-  s.homepage    = "http://github.com/bradgessler/quebert"
+  s.homepage    = "http://github.com/polleverywhere/quebert"
   s.summary     = %q{A worker queue framework built around beanstalkd}
   s.description = %q{A worker queue framework built around beanstalkd}
 
