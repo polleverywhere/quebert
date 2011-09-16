@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{quebert}
-  s.version = "0.0.7"
+  s.version = "0.0.8"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Brad Gessler"]
-  s.date = %q{2011-03-18}
+  s.date = %q{2011-09-16}
   s.default_executable = %q{quebert}
   s.description = %q{A worker queue framework built around beanstalkd}
   s.email = %q{brad@bradgessler.com}
@@ -65,7 +65,7 @@ Gem::Specification.new do |s|
   ]
   s.homepage = %q{http://github.com/bradgessler/quebert}
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.5.2}
+  s.rubygems_version = %q{1.3.7}
   s.summary = %q{A worker queue framework built around beanstalkd}
   s.test_files = [
     "spec/async_sender_spec.rb",
@@ -84,6 +84,7 @@ Gem::Specification.new do |s|
   ]
 
   if s.respond_to? :specification_version then
+    current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
