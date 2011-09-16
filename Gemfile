@@ -1,10 +1,10 @@
-source :rubygems
+source "http://rubygems.org"
 
-gem 'json'
-gem 'beanstalk-client'
+# Specify your gem's dependencies in quebert.gemspec
+gemspec
 
+# TODO - update this to Guard and move into the gemspec dev dependencies
 group :test do
-  gem 'rspec',                    '1.3.0',        :require => nil
   gem 'ZenTest'
   gem 'ruby-debug'
   gem 'activerecord',             '2.3.5'

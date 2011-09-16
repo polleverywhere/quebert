@@ -1,3 +1,5 @@
+require 'quebert/version'
+
 module Quebert
   autoload :Serializer,         'quebert/serializer'
   autoload :Configuration,      'quebert/configuration'
