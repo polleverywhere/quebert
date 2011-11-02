@@ -2,6 +2,7 @@ source :rubygems
 
 gem 'json'
 gem 'beanstalk-client'
+gem 'system_timer'
 
 group :test do
   gem 'rspec',                    '1.3.0',        :require => nil

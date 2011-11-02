@@ -48,7 +48,6 @@ describe Quebert::Job do
     end
   end
   
-  
   context "job queue" do
     it "should enqueue" do
       lambda{
@@ -85,5 +84,13 @@ describe Quebert::Job do
         job.beanstalk_job.ttr.should eql(300)
       end
     end
-  end  
+  end
+  
+  context "Timeout" do
+    it "should respect TTR option" do
+      lambda {
+        TimeoutJob.new.perform!
+      }.should raise_exception(Quebert::Job::Timeout)
+    end
+  end
 end

@@ -16,6 +16,19 @@ class BuryJob < Quebert::Job
   end
 end
 
+class TimeoutJob < Quebert::Job
+  def perform!
+    # 1 second TTR
+    @ttr = 1
+    super
+  end
+
+  def perform
+    # 10 second task should definitely raise a Job::Timeout exception
+    sleep(10)
+  end
+end
+
 class Adder < Quebert::Job
   def perform(*args)
     args.inject(0){|sum, n| sum = sum + n}

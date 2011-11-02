@@ -1,4 +1,5 @@
 require 'json'
+require 'system_timer'
 
 module Quebert
   class Job
@@ -16,7 +17,8 @@ module Quebert
     Bury    = Class.new(Action)
     Delete  = Class.new(Action)
     Release = Class.new(Action)
-    
+    Timeout = Class.new(Action)
+
     def initialize(*args)
       opts = args.last.is_a?(::Hash) ? args.pop : nil
       
@@ -44,7 +46,10 @@ module Quebert
     
     # Runs the perform method that somebody else should be implementing
     def perform!
-      perform(*args)
+      # Honor the timeout and kill the job 
+      SystemTimer.timeout_after(@ttr, Job::Timeout) do
+        perform(*args)
+      end
     end
     
     def enqueue

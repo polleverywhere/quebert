@@ -32,6 +32,9 @@ module Quebert
           beanstalk_job.release
         rescue Job::Bury
           beanstalk_job.bury
+        rescue Job::Timeout => e
+          beanstalk_job.bury
+          raise e
         rescue Exception => e
           beanstalk_job.bury
           raise e
