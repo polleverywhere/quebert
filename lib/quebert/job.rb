@@ -8,7 +8,7 @@ module Quebert
     
     DEFAULT_JOB_PRIORITY = 65536
     DEFAULT_JOB_DELAY = 0
-    DEFAULT_JOB_TTR = 120
+    DEFAULT_JOB_TTR = 10
 
     NotImplemented = Class.new(StandardError)
     
