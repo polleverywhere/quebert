@@ -1,4 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
+require 'ruby-debug'
 
 describe Controller::Base do
   it "should perform job" do
@@ -69,5 +70,30 @@ describe Controller::Beanstalk do
       @q.peek_ready.should be_nil
       @q.peek_buried.should_not be_nil
     end
+  end
+
+  it "should retry a job with a delay and then bury" do
+    @q.put TimeoutJob.new
+    @q.peek_ready.should_not be_nil
+    job = @q.reserve
+    job.beanstalk_job.stats["releases"].should eql(0)
+    job.beanstalk_job.stats["delay"].should eql(0)
+    lambda{job.perform}.should raise_exception(Quebert::Job::Timeout)
+    
+    @q.peek_ready.should be_nil
+    beanstalk_job = @q.peek_delayed
+    beanstalk_job.should_not be_nil
+    beanstalk_job.stats["releases"].should eql(1)
+    beanstalk_job.stats["delay"].should eql(Quebert::Controller::Beanstalk::TIMEOUT_RETRY_GROWTH_RATE**beanstalk_job.stats["releases"])
+
+    sleep(3)
+
+    # lets set the max retry delay so it should bury instead of delay
+    Quebert::Controller::Beanstalk::MAX_TIMEOUT_RETRY_DELAY = 1
+    lambda{@q.reserve.perform}.should raise_exception(Quebert::Job::Timeout)
+    
+    @q.peek_ready.should be_nil
+    @q.peek_delayed.should be_nil
+    @q.peek_buried.should_not be_nil
   end
 end

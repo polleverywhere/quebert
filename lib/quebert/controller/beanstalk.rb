@@ -3,7 +3,11 @@ module Quebert
     # Handle interactions between a job and a Beanstalk queue.
     class Beanstalk < Base
       attr_reader :beanstalk_job, :queue, :job
-      
+          
+      MAX_TIMEOUT_RETRY_DELAY = 300
+      TIMEOUT_RETRY_DELAY_SEED = 2
+      TIMEOUT_RETRY_GROWTH_RATE = 3
+
       def initialize(beanstalk_job, queue)
         @beanstalk_job, @queue = beanstalk_job, queue
 
@@ -12,7 +16,7 @@ module Quebert
         rescue Job::Delete
           beanstalk_job.delete
         rescue Job::Release
-          beanstalk_job.release nil, @job.delay
+          beanstalk_job.release @job.priority, @job.delay
         rescue Job::Bury
           beanstalk_job.bury
         rescue Exception => e
@@ -29,15 +33,26 @@ module Quebert
         rescue Job::Delete
           beanstalk_job.delete
         rescue Job::Release
-          beanstalk_job.release nil, @job.delay
+          beanstalk_job.release @job.priority, @job.delay
         rescue Job::Bury
           beanstalk_job.bury
         rescue Job::Timeout => e
-          beanstalk_job.bury
+          retry_with_delay
           raise e
         rescue Exception => e
           beanstalk_job.bury
           raise e
+        end
+      end
+
+    protected
+      def retry_with_delay
+        delay = TIMEOUT_RETRY_DELAY_SEED + TIMEOUT_RETRY_GROWTH_RATE**beanstalk_job.stats["releases"].to_i
+        
+        if delay > MAX_TIMEOUT_RETRY_DELAY
+          beanstalk_job.bury
+        else
+          beanstalk_job.release @job.priority, delay
         end
       end
     end

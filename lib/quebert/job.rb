@@ -69,10 +69,10 @@ module Quebert
     def self.backend=(backend)
       @backend = backend
     end
+    
     def self.backend
       @backend || Quebert.configuration.backend
     end
-    
   protected
     def delete!
       raise Delete

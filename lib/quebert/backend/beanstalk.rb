@@ -20,6 +20,9 @@ module Quebert
         while peek_ready do
           reserve_without_controller.delete
         end
+        while peek_delayed do
+          reserve_without_controller.delete
+        end
         while job = peek_buried do
           last_conn.kick 1 # what? Why the 1? it kicks them all?
           reserve_without_controller.delete
