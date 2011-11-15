@@ -3,6 +3,8 @@ require 'system_timer'
 
 module Quebert
   class Job
+    include Logging
+
     attr_reader :args
     attr_accessor :priority, :delay, :ttr
     
@@ -73,6 +75,7 @@ module Quebert
     def self.backend
       @backend || Quebert.configuration.backend
     end
+
   protected
     def delete!
       raise Delete

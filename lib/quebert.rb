@@ -10,6 +10,7 @@ module Quebert
   autoload :Worker,             'quebert/worker'
   autoload :CommandLineRunner,  'quebert/command_line_runner'
   autoload :AsyncSender,        'quebert/async_sender'
+  autoload :Logging,            'quebert/logging'
   
   class << self
     def configuration

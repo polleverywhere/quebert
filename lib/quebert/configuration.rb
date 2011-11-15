@@ -5,11 +5,19 @@ module Quebert
     attr_accessor :backend, :logger, :worker
     
     def logger
-      @logger ||= Logger.new($stdout)
+      @logger ||= begin
+        l = Logger.new($stdout)
+        l.formatter = Logger::Formatter.new
+        l
+      end
     end
     
     def log_file_path=(path)
-      self.logger = Logger.new(path)
+      self.logger = begin
+        l = Logger.new(path)
+        l.formatter = Logger::Formatter.new
+        l
+      end
     end
     
     def from_hash(hash)
