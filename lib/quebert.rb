@@ -3,6 +3,8 @@ require 'quebert/version'
 module Quebert
   autoload :Serializer,         'quebert/serializer'
   autoload :Configuration,      'quebert/configuration'
+  autoload :Timeout,            'quebert/timeout'
+  autoload :Logging,            'quebert/logging'
   autoload :Job,                'quebert/job'
   autoload :Controller,         'quebert/controller'
   autoload :Backend,            'quebert/backend'
@@ -10,8 +12,7 @@ module Quebert
   autoload :Worker,             'quebert/worker'
   autoload :CommandLineRunner,  'quebert/command_line_runner'
   autoload :AsyncSender,        'quebert/async_sender'
-  autoload :Logging,            'quebert/logging'
-  
+
   class << self
     def configuration
       @configuration ||= Configuration.new

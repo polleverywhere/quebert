@@ -3,9 +3,13 @@ source "http://rubygems.org"
 # Specify your gem's dependencies in quebert.gemspec
 gemspec
 
-# TODO - update this to Guard and move into the gemspec dev dependencies
+group :development do
+  gem 'system_timer', :require => false, :platform => :ruby_18
+end
+
 group :test do
-  gem 'ruby-debug'
+  gem 'ruby-debug',   :platform => :ruby_18
+  gem 'ruby-debug19', :platform => :ruby_19
   gem 'activerecord', '2.3.5'
   gem 'sqlite3-ruby'
   gem 'guard-rspec'

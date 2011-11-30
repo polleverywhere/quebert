@@ -1,5 +1,4 @@
 require 'json'
-require 'system_timer'
 
 module Quebert
   class Job
@@ -48,9 +47,13 @@ module Quebert
     
     # Runs the perform method that somebody else should be implementing
     def perform!
-      # Honor the timeout and kill the job 
-      SystemTimer.timeout_after(@ttr, Job::Timeout) do
-        perform(*args)
+      # Honor the timeout and kill the job in ruby-space. Beanstalk
+      # should be cleaning up this job and returning it to the queue
+      # as well.
+      begin
+        Quebert::Timeout.timeout(@ttr){ perform(*args) }
+      rescue ::Timeout::Error
+        raise Job::Timeout
       end
     end
     
