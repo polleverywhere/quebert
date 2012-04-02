@@ -23,5 +23,5 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "json"
   s.add_runtime_dependency "beanstalk-client"
   
-  s.add_development_dependency 'rspec', '1.3.0'
+  s.add_development_dependency 'rspec', '2.7.0'
 end
