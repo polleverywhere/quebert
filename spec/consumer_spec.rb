@@ -1,5 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
-require 'ruby-debug'
+require 'spec_helper'
 
 describe Controller::Base do
   it "should perform job" do

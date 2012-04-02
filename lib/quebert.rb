@@ -1,10 +1,10 @@
 require 'quebert/version'
 
 module Quebert
+  autoload :Logging,            'quebert/logging'
   autoload :Serializer,         'quebert/serializer'
   autoload :Configuration,      'quebert/configuration'
   autoload :Timeout,            'quebert/timeout'
-  autoload :Logging,            'quebert/logging'
   autoload :Job,                'quebert/job'
   autoload :Controller,         'quebert/controller'
   autoload :Backend,            'quebert/backend'

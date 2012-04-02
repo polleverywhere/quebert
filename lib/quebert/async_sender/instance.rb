@@ -4,7 +4,7 @@ module Quebert
     module Instance
       class InstanceJob < Job
         def perform(klass, init_args, meth, *args)
-          Support.constantize(klass).new(init_args).send(meth, *args)
+          Support.constantize(klass).new(*init_args).send(meth, *args)
         end
       end
       

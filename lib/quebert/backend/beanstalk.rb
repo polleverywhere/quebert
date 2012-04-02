@@ -29,8 +29,11 @@ module Quebert
         end
       end
       
+      def initialize(host, *args)
+        super Array(host), *args
+      end
       def self.configure(opts={})
-        opts[:host] ||= '127.0.0.1:11300'
+        opts[:host] ||= ['127.0.0.1:11300']
         new(opts[:host], opts[:tube])
       end
     end
