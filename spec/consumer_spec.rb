@@ -73,7 +73,8 @@ describe Controller::Beanstalk do
   end
 
   it "should retry a job with a delay and then bury" do
-    @q.put TimeoutJob.new
+    TimeoutJob.backend = @q
+    TimeoutJob.new.enqueue
     @q.peek_ready.should_not be_nil
     job = @q.reserve
     job.beanstalk_job.stats["releases"].should eql(0)

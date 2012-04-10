@@ -2,7 +2,7 @@ require 'logger'
 
 module Quebert
   module Logging
-   protected
+    protected
     def logger
       @logger ||= Quebert.logger
     end

@@ -73,7 +73,7 @@ describe Quebert::Job do
         job = @q.reserve
         job.beanstalk_job.pri.should eql(1)
         job.beanstalk_job.delay.should eql(2)
-        job.beanstalk_job.ttr.should eql(300)
+        job.beanstalk_job.ttr.should eql(300 + Job::QUEBERT_TTR_BUFFER)
       end
 
       it "should enqueue and honor beanstalk options" do
@@ -81,7 +81,7 @@ describe Quebert::Job do
         job = @q.reserve
         job.beanstalk_job.pri.should eql(1)
         job.beanstalk_job.delay.should eql(2)
-        job.beanstalk_job.ttr.should eql(300)
+        job.beanstalk_job.ttr.should eql(300 + Job::QUEBERT_TTR_BUFFER)
       end
     end
   end

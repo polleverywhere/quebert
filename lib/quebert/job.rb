@@ -11,6 +11,11 @@ module Quebert
     DEFAULT_JOB_DELAY = 0
     DEFAULT_JOB_TTR = 10
 
+    # A buffer time in seconds added to the Beanstalk TTR for Quebert to do its own job cleanup 
+    # The job will perform based on the Beanstalk TTR, but Beanstalk hangs on to the job just a
+    # little longer so that Quebert can bury the job or schedule a retry with the appropriate delay
+    QUEBERT_TTR_BUFFER = 1
+
     NotImplemented = Class.new(StandardError)
     
     Action  = Class.new(Exception)
@@ -58,7 +63,7 @@ module Quebert
     end
     
     def enqueue
-      self.class.backend.put self, @priority, @delay, @ttr
+      self.class.backend.put self, @priority, @delay, @ttr + QUEBERT_TTR_BUFFER
     end
     
     def to_json

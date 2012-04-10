@@ -68,7 +68,7 @@ module Quebert
     protected
       def retry_with_delay
         delay = TIMEOUT_RETRY_DELAY_SEED + TIMEOUT_RETRY_GROWTH_RATE**beanstalk_job.stats["releases"].to_i
-        
+
         if delay > MAX_TIMEOUT_RETRY_DELAY
           beanstalk_job.bury
           log "Max retry delay exceeded. Burrying job."
