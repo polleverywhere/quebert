@@ -6,12 +6,7 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 
 require 'quebert'
 require 'quebert/logging'
-require 'spec'
-require 'spec/autorun'
 require 'logger'
-
-Spec::Runner.configure do |config|
-end
 
 include Quebert
 Quebert.config.logger = Logger.new('/dev/null') # Shhh...

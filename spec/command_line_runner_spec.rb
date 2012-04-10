@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
+require 'spec_helper'
 
 describe CommandLineRunner do
   before(:all) do
@@ -53,7 +53,7 @@ describe CommandLineRunner do
     it "should run config file" do
       clean_file './super_awesome.rb', "raise 'SuperAwesome'" do
         lambda{
-          CommandLineRunner.dispatch(%w(worker --config super_awesome.rb))
+          CommandLineRunner.dispatch(%w(worker --config ./super_awesome.rb))
         }.should raise_exception('SuperAwesome')
       end
     end

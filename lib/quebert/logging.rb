@@ -1,5 +1,3 @@
-require 'logger'
-
 module Quebert
   module Logging
     protected

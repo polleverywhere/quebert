@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
+require 'spec_helper'
 
 describe AsyncSender::Class do
   
@@ -31,7 +31,7 @@ describe AsyncSender::Class do
   
   it "should async send instance methods" do
     Greeter.new("brad").async_send(:hi, 'stunning')
-    @q.reserve.perform.should eql(Greeter.new("brad").send(:hi, 'stunning'))
+    @q.reserve.perform.should eql(Greeter.new("brad").hi('stunning'))
   end
   
 end
