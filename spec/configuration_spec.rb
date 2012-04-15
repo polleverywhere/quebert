@@ -16,3 +16,4 @@ describe Configuration do
     
   end
 end
+

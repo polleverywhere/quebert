@@ -5,3 +5,4 @@ module Quebert
     autoload :Sync,       'quebert/backend/sync.rb'
   end
 end
+
