@@ -57,8 +57,9 @@ module Quebert
       # as well.
       begin
         Quebert::Timeout.timeout(@ttr){ perform(*args) }
-      rescue ::Timeout::Error
-        raise Job::Timeout
+      rescue ::Timeout::Error => e
+        log e.backtrace.join('\n'), :error
+        raise Job::Timeout, e.message, caller
       end
     end
     
