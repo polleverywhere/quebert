@@ -58,6 +58,11 @@ module Quebert
         rescue Job::Timeout => e
           retry_with_delay
           raise e
+        rescue Job::Retry => e
+          # The difference between the Retry and Timeout class is that
+          # Retry does not log an exception where as Timeout does
+          log "Manually retrying with delay"
+          retry_with_delay
         rescue Exception => e
           beanstalk_job.bury
           log "Exception caught on perform. Job buried. #{e.inspect}", :error

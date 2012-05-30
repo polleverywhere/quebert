@@ -14,7 +14,7 @@ module Quebert
     # A buffer time in seconds added to the Beanstalk TTR for Quebert to do its own job cleanup 
     # The job will perform based on the Beanstalk TTR, but Beanstalk hangs on to the job just a
     # little longer so that Quebert can bury the job or schedule a retry with the appropriate delay
-    QUEBERT_TTR_BUFFER = 1
+    QUEBERT_TTR_BUFFER = 5
 
     NotImplemented = Class.new(StandardError)
     
@@ -24,6 +24,7 @@ module Quebert
     Delete  = Class.new(Action)
     Release = Class.new(Action)
     Timeout = Class.new(Action)
+    Retry   = Class.new(Action)
 
     def initialize(*args)
       opts = args.last.is_a?(::Hash) ? args.pop : nil
