@@ -47,15 +47,19 @@ module Quebert
           log "Completed in #{(time*1000*1000).to_i/1000.to_f} ms\n"
           result
         rescue Job::Delete
+          log "Deleting job", :error
           beanstalk_job.delete
-          log "Deleted", :error
+          log "Job deleted", :error
         rescue Job::Release
+          log "Releasing with priority: #{@job.priority} and delay: #{@job.delay}", :error 
           beanstalk_job.release @job.priority, @job.delay
-          log "Released with priority: #{@job.priority} and delay: #{@job.delay}", :error 
+          log "Job released", :error 
         rescue Job::Bury
+          log "Burrying job", :error
           beanstalk_job.bury
-          log "Burried", :error
+          log "Job burried", :error
         rescue Job::Timeout => e
+          log "Job timed out!", :error
           retry_with_delay
           raise e
         rescue Job::Retry => e
@@ -64,8 +68,9 @@ module Quebert
           log "Manually retrying with delay"
           retry_with_delay
         rescue Exception => e
+          log "Exception caught on perform. Burrying job. #{e.inspect}", :error
           beanstalk_job.bury
-          log "Exception caught on perform. Job buried. #{e.inspect}", :error
+          log "Job buried", :error
           raise e
         end
       end
@@ -75,11 +80,13 @@ module Quebert
         delay = TIMEOUT_RETRY_DELAY_SEED + TIMEOUT_RETRY_GROWTH_RATE**beanstalk_job.stats["releases"].to_i
 
         if delay > MAX_TIMEOUT_RETRY_DELAY
+          log "Max retry delay exceeded. Burrying job"
           beanstalk_job.bury
-          log "Max retry delay exceeded. Burrying job."
+          log "Job burried"
         else
-          beanstalk_job.release @job.priority, delay
           log "TTR exceeded. Releasing with priority: #{@job.priority} and delay: #{delay}"
+          beanstalk_job.release @job.priority, delay
+          log "Job released"
         end
       end
 
