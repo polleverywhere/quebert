@@ -77,16 +77,22 @@ module Quebert
 
     protected
       def retry_with_delay
-        delay = TIMEOUT_RETRY_DELAY_SEED + TIMEOUT_RETRY_GROWTH_RATE**beanstalk_job.stats["releases"].to_i
+        begin
+          delay = TIMEOUT_RETRY_DELAY_SEED + TIMEOUT_RETRY_GROWTH_RATE**beanstalk_job.stats["releases"].to_i
 
-        if delay > MAX_TIMEOUT_RETRY_DELAY
-          log "Max retry delay exceeded. Burrying job"
-          beanstalk_job.bury
-          log "Job burried"
-        else
-          log "TTR exceeded. Releasing with priority: #{@job.priority} and delay: #{delay}"
-          beanstalk_job.release @job.priority, delay
-          log "Job released"
+          if delay > MAX_TIMEOUT_RETRY_DELAY
+            log "Max retry delay exceeded. Burrying job"
+            beanstalk_job.bury
+            log "Job burried"
+          else
+            log "TTR exceeded. Releasing with priority: #{@job.priority} and delay: #{delay}"
+            beanstalk_job.release @job.priority, delay
+            log "Job released"
+          end
+        rescue Beanstalk::NotFoundError => e
+          log "Job ran longer than allowed. Beanstalk already deleted it!!!!", :error
+          # Sometimes the timer doesn't behave correctly and this job actually runs longer than
+          # allowed. At that point the beanstalk job no longer exists anymore. Lets let it go and don't blow up.
         end
       end
 
