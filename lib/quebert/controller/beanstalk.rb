@@ -89,7 +89,7 @@ module Quebert
             beanstalk_job.release @job.priority, delay
             log "Job released"
           end
-        rescue Beanstalk::NotFoundError => e
+        rescue ::Beanstalk::NotFoundError => e
           log "Job ran longer than allowed. Beanstalk already deleted it!!!!", :error
           # Sometimes the timer doesn't behave correctly and this job actually runs longer than
           # allowed. At that point the beanstalk job no longer exists anymore. Lets let it go and don't blow up.
