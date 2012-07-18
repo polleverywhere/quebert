@@ -97,3 +97,4 @@ describe Controller::Beanstalk do
     @q.peek_buried.should_not be_nil
   end
 end
+

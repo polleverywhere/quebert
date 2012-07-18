@@ -22,8 +22,8 @@ module Quebert
         end
       end
       
-      def initialize_with_async_sender(*args)
-        initialize_without_async_sender(*(@_init_args = args))
+      def initialize_with_async_sender(*args,&block)
+        initialize_without_async_sender(*(@_init_args = args),&block)
       end
       
       module ClassMethods

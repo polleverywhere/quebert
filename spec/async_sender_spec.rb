@@ -11,8 +11,11 @@ describe AsyncSender::Class do
   class Greeter
     include AsyncSender::Class
     
+    attr_accessor :age
+
     def initialize(name)
       @name = name
+      yield self if block_given?
     end
     
     def hi(desc)
@@ -23,7 +26,7 @@ describe AsyncSender::Class do
       "hi #{name}!"
     end
   end
-  
+
   it "should async send class methods" do
     Greeter.async_send(:hi, 'Jeannette')
     @q.reserve.perform.should eql(Greeter.send(:hi, 'Jeannette'))
@@ -33,7 +36,12 @@ describe AsyncSender::Class do
     Greeter.new("brad").async_send(:hi, 'stunning')
     @q.reserve.perform.should eql(Greeter.new("brad").hi('stunning'))
   end
-  
+
+  it "should preserve class initialization if class accepts a block" do
+    g = Greeter.new("brad"){|g| g.age = "57"}
+    g.age.should eql("57")
+  end
+
 end
 
 describe AsyncSender::ActiveRecord do

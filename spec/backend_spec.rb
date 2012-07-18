@@ -36,7 +36,7 @@ end
 
 describe Backend::Beanstalk  do
   before(:all) do
-    @q = Backend::Beanstalk.new('localhost:11300','quebert-test')
+    @q = Backend::Beanstalk.new(['localhost:11300','quebert-test'])
     @q.drain!
   end
   

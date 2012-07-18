@@ -59,7 +59,7 @@ describe Quebert::Job do
       before(:all) do
         Quebert.serializers.register 'ActiveRecord::Base', Serializer::ActiveRecord
 
-        @q = Backend::Beanstalk.new('localhost:11300','quebert-test')
+        @q = Backend::Beanstalk.new(['localhost:11300','quebert-test'])
 
         Quebert::AsyncSender::ActiveRecord::RecordJob.backend = @q
         Quebert::AsyncSender::Object::ObjectJob.backend = @q
