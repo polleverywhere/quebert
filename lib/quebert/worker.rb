@@ -1,3 +1,5 @@
+require 'system_timer'
+
 module Quebert
   class Worker
     include Logging
@@ -14,7 +16,8 @@ module Quebert
       Signal.trap('INT') { safe_stop }
 
       logger.info "Worker started with #{backend.class.name} backend\n"
-      while @controller = backend.reserve do
+      while @controller = reserve_with_timeout do
+        logger.error "Reserved job => #{@controller.inspect}"
         begin
           @controller.perform
         rescue Exception => error
@@ -58,6 +61,16 @@ module Quebert
 
     def exception_handler
       @exception_handler ||= Quebert.config.worker.exception_handler
+    end
+
+    def reserve_with_timeout
+      ::SystemTimer.timeout_after 5 do
+        logger.error "poopy"
+        backend.reserve
+      end
+    rescue ::Timeout::Error, ::Beanstalk::DeadlineSoonError, Exception
+      logger.error "Reserve timed out! Retrying..."
+      retry
     end
   end
 end
