@@ -5,16 +5,12 @@ module Quebert
     
     # Manage jobs on a Beanstalk queue out of process
     class Beanstalk < Beanstalk::Pool
-
-      # ZZ: Let's try timing out our reserve on both sides... Double Rainbow!!
-      RESERVE_TIMEOUT = 20
-
       def put(job, *args)
         super job.to_json, *args
       end
       
-      def reserve_with_controller
-        Controller::Beanstalk.new reserve_without_controller(RESERVE_TIMEOUT), self
+      def reserve_with_controller(timeout=nil)
+        Controller::Beanstalk.new reserve_without_controller(timeout), self
       end
       alias :reserve_without_controller :reserve
       alias :reserve :reserve_with_controller
