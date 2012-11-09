@@ -15,7 +15,7 @@ module Quebert
       Signal.trap('TERM') { safe_stop }
       Signal.trap('INT') { safe_stop }
 
-      logger.info "Worker started with #{backend.class.name} backend\n"
+      logger.info "Worker started with #{backend.class.name} backend\n  => #{self.inspect}\n"
       while @controller = reserve_with_timeout do
         logger.error "Reserved job => #{@controller.inspect}"
         begin
@@ -63,12 +63,18 @@ module Quebert
       @exception_handler ||= Quebert.config.worker.exception_handler
     end
 
+    RESERVE_TIMEOUT = 10
+
     def reserve_with_timeout
-      ::SystemTimer.timeout_after 5 do
-        logger.error "poopy"
-        backend.reserve
+      # We'll time out the connection our selves, if the server don't do it!
+      ::SystemTimer.timeout_after(RESERVE_TIMEOUT + 2) do
+        return backend.reserve RESERVE_TIMEOUT
       end
-    rescue ::Timeout::Error, ::Beanstalk::DeadlineSoonError, Exception
+    rescue ::Timeout::Error
+      logger.error "Client reserve timeout. Let's close the connection..."
+      backend.close
+      retry
+    rescue ::Beanstalk::DeadlineSoonError, Exception
       logger.error "Reserve timed out! Retrying..."
       retry
     end
