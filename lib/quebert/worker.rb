@@ -63,7 +63,7 @@ module Quebert
       @exception_handler ||= Quebert.config.worker.exception_handler
     end
 
-    RESERVE_TIMEOUT = 10
+    RESERVE_TIMEOUT = 15
 
     def reserve_with_timeout
       # We'll time out the connection our selves, if the server don't do it!
