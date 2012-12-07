@@ -14,5 +14,4 @@ group :test do
   gem 'sqlite3-ruby'
   gem 'guard-rspec'
   gem 'rb-fsevent'
-  gem 'growl'
 end
