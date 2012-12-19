@@ -1,10 +1,10 @@
-require 'beanstalk-client'
+require 'beaneater'
 
 module Quebert
   module Backend
     
     # Manage jobs on a Beanstalk queue out of process
-    class Beanstalk < Beanstalk::Pool
+    class Beanstalk < Beaneater::Pool
       def put(job, *args)
         super job.to_json, *args
       end
