@@ -7,11 +7,11 @@ describe Worker do
       w.backend = @q
     end
   end
-  
+
   it "should start" do
     @w.start
   end
-  
+
   context "pluggable exception handler" do
     it "should raise exception if nothing is provided" do
       @q.put Exceptional.new
@@ -20,14 +20,13 @@ describe Worker do
 
     it "should default to Quebert.config.worker.exception_handler handler" do
       @q.put Exceptional.new
-      Quebert.config.worker.exception_handler = Proc.new{|e| e.should be_instance_of(Exception) }
-      @w.exception_handler = Proc.new{|e| e.should be_instance_of(Exception) }
+      Quebert.config.worker.exception_handler = Proc.new{|e, opts| e.should be_instance_of(Exception) }
       lambda{ @w.start }.should_not raise_exception
     end
-    
+
     it "should intercept exceptions" do
       @q.put Exceptional.new
-      @w.exception_handler = Proc.new{|e| e.should be_instance_of(Exception) }
+      @w.exception_handler = Proc.new{|e, opts| e.should be_instance_of(Exception) }
       lambda{ @w.start }.should_not raise_exception
     end
   end
