@@ -4,33 +4,45 @@ module Quebert
   module Backend
     
     # Manage jobs on a Beanstalk queue out of process
-    class Beanstalk < Beaneater::Pool
+    class Beanstalk
       def put(job, *args)
-        super job.to_json, *args
+        priority, delay, ttr = args
+        opts = {}
+        opts[:pri]   = priority unless priority.nil?
+        opts[:delay] = delay    unless delay.nil?
+        opts[:ttr]   = ttr      unless ttr.nil?
+        @tube.put job.to_json, opts
       end
-      
-      def reserve_with_controller
-        Controller::Beanstalk.new(reserve_without_controller, self)
+
+      def reserve_without_controller(timeout=nil)
+        @tube.reserve timeout
       end
-      alias :reserve_without_controller :reserve
-      alias :reserve :reserve_with_controller
-      
+
+      def reserve(timeout=nil)
+        Controller::Beanstalk.new reserve_without_controller(timeout), self
+      end
+
+      def peek(state)
+        @tube.peek state
+      end
+
       # For testing purposes... I think there's a better way to do this though.
       def drain!
-        while peek_ready do
+        while peek(:ready) do
           reserve_without_controller.delete
         end
-        while peek_delayed do
+        while peek(:delayed) do
           reserve_without_controller.delete
         end
-        while job = peek_buried do
-          last_conn.kick 1 # what? Why the 1? it kicks them all?
+        while peek(:buried) do
+          @tube.kick
           reserve_without_controller.delete
         end
       end
       
-      def initialize(host, *args)
-        super Array(host), *args
+      def initialize(host, tube)
+        @pool = Beaneater::Pool.new Array(host)
+        @tube = @pool.tubes[tube]
       end
       def self.configure(opts={})
         opts[:host] ||= ['127.0.0.1:11300']

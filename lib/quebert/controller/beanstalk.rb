@@ -52,7 +52,7 @@ module Quebert
           log "Job deleted", :error
         rescue Job::Release
           log "Releasing with priority: #{@job.priority} and delay: #{@job.delay}", :error 
-          beanstalk_job.release @job.priority, @job.delay
+          beanstalk_job.release :pri => @job.priority, :delay => @job.delay
           log "Job released", :error 
         rescue Job::Bury
           log "Burrying job", :error
@@ -86,10 +86,10 @@ module Quebert
             log "Job burried"
           else
             log "TTR exceeded. Releasing with priority: #{@job.priority} and delay: #{delay}"
-            beanstalk_job.release @job.priority, delay
+            beanstalk_job.release :pri => @job.priority, :delay => delay
             log "Job released"
           end
-        rescue ::Beanstalk::NotFoundError => e
+        rescue ::Beaneater::NotFoundError => e
           log "Job ran longer than allowed. Beanstalk already deleted it!!!!", :error
           # Sometimes the timer doesn't behave correctly and this job actually runs longer than
           # allowed. At that point the beanstalk job no longer exists anymore. Lets let it go and don't blow up.
