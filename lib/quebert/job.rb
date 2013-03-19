@@ -7,7 +7,13 @@ module Quebert
     attr_reader :args
     attr_accessor :priority, :delay, :ttr
 
-    DEFAULT_JOB_PRIORITY = 65536
+    # Prioritize Quebert jobs as specified in https://github.com/kr/beanstalkd/blob/master/doc/protocol.txt.
+    class Priority
+      LOW     = 2**32
+      MEDIUM  = LOW / 2
+      HIGH    = 0
+    end
+
     DEFAULT_JOB_DELAY = 0
     DEFAULT_JOB_TTR = 10
 
@@ -29,7 +35,7 @@ module Quebert
     def initialize(*args)
       opts = args.last.is_a?(::Hash) ? args.pop : nil
 
-      @priority = DEFAULT_JOB_PRIORITY
+      @priority = Job::Priority::MEDIUM
       @delay = DEFAULT_JOB_DELAY
       @ttr = DEFAULT_JOB_TTR
 

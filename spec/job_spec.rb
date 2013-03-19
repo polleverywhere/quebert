@@ -27,7 +27,23 @@ describe Quebert::Job do
     unserialized.should be_instance_of(Adder)
     unserialized.args.should eql(args)
   end
-  
+
+  it "should have default MEDIUM priority" do
+    Job.new.priority.should == Quebert::Job::Priority::MEDIUM
+  end
+
+  describe "Quebert::Job::Priority" do
+    it "should have LOW priority of 4294967296" do
+      Quebert::Job::Priority::LOW.should == 4294967296
+    end
+    it "should have MEDIUM priority of 2147483648" do
+      Quebert::Job::Priority::MEDIUM.should == 2147483648
+    end
+    it "should have HIGH priority of 0" do
+      Quebert::Job::Priority::HIGH.should == 0
+    end
+  end
+
   context "actions" do
     it "should raise release" do
       lambda{
