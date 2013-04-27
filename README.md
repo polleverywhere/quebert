@@ -1,16 +1,18 @@
-= Quebert
+# Quebert
+
+[![Build Status](https://travis-ci.org/polleverywhere/quebert.png?branch=master)](https://travis-ci.org/polleverywhere/quebert)
 
 async_observer is great, but is dated and doesn't really support running jobs outside of the async_send idiom. Quebert is an attempt to mix how jobs are run in other popular worker queue frameworks, like resque and dj, with async_observer so that you can have it both ways.
 
-= Why Quebert (or how is it different from DJ and Resque)?
+# Why Quebert (or how is it different from DJ and Resque)?
 
 Because it has really low latency. Other Ruby queuing frameworks, like DJ or Resque, have to poll their queue servers periodicly. You could think of it as a "pull" queue. Quebert is a "push" queue. It maintains a persistent connection with beanstalkd and when is enqueud, its instantly pushed to the workers and executed.
 
-= Who uses it?
+# Who uses it?
 
 Quebert is a serious project. Its used in a production environment at Poll Everywhere to handle everything from SMS message processing to account downgrades.
 
-= Features
+# Features
 
 * Multiple back-ends (InProcess, Sync, and Beanstalk)
 * Rails/ActiveRecord integration similar to async_observer
@@ -22,11 +24,11 @@ Some features that are currently missing that I will soon add include:
 * Rails plugin support (The AR integrations have to be done manually today)
 * Auto-detecting serializers. Enhanced ClassRegistry to more efficiently look up serializers for objects.
 
-= How to use
+# How to use
 
 There are two ways to enqueue jobs with Quebert: through the Job itself, provided you set a default back-end for the job, or put it on the backend.
 
-== Jobs
+## Jobs
 
 Quebert includes a Job class so you can implement how you want certain types of Jobs performed.
     
@@ -51,7 +53,7 @@ Then perform the jobs!
     Quebert.backend.reserve.perform # => 6
     Quebert.backend.reserve.perform # => 15
 
-== Async Sender
+## Async Sender
 
 Take any ol' class and include the Quebert::AsyncSender.
 
@@ -98,25 +100,3 @@ Does it work on Class methods? Yeah, that was easier than making instance method
     Quebert.backend.reserve.perform # => "waazup Corey!"
 
 * Only basic data types are included for serialization. Serializers may be customized to include support for different types.
-
-= License 
-
-Copyright (c) 2010 Brad Gessler
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
