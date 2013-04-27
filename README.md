@@ -60,7 +60,7 @@ Take any ol' class and include the Quebert::AsyncSender.
     Quebert.backend = Quebert::Backend::InProcess.new
 
     class Greeter
-      include Quebert::AsyncSender
+      include Quebert::AsyncSender::Class
       
       def initialize(name)
         @name = name
