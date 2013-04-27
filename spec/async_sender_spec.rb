@@ -22,6 +22,15 @@ describe AsyncSender::Class do
     def self.hi(name)
       "hi #{name}!"
     end
+
+  private
+    def bye(desc)
+      "bye #{@name}, you look #{desc}"
+    end
+
+    def self.bye(name)
+      "bye #{name}!"
+    end
   end
   
   describe "#async_send" do
@@ -45,6 +54,16 @@ describe AsyncSender::Class do
     it "should async send instance methods" do
       Greeter.new("brad").async.hi('stunning')
       @q.reserve.perform.should eql(Greeter.new("brad").hi('stunning'))
+    end
+
+    it "should async send private instance methods" do
+      Greeter.new("brad").async.send(:bye, 'stunning')
+      @q.reserve.perform.should eql(Greeter.new("brad").send(:bye, 'stunning'))
+    end
+
+    it "should async send private class methods" do
+      Greeter.async.send(:bye, 'Jeannette')
+      @q.reserve.perform.should eql(Greeter.send(:bye, 'Jeannette'))
     end
   end
 end

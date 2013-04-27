@@ -9,8 +9,8 @@ module Quebert
       end
       
       def self.included(base)
-        base.send(:extend, ClassMethods)
         base.send(:extend, AsyncSender::Promise::DSL)
+        base.send(:extend, ClassMethods)
       end
       
       module ClassMethods
