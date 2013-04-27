@@ -10,11 +10,12 @@ module Quebert
       
       def self.included(base)
         base.send(:extend, ClassMethods)
+        base.send(:extend, AsyncSender::Promise::DSL)
       end
       
       module ClassMethods
-        def async_send(meth, *args)
-          ObjectJob.new(self.name, meth, *args).enqueue
+        def build_job(meth, *args)
+          ObjectJob.new(self.name, meth, *args)
         end
       end
     end

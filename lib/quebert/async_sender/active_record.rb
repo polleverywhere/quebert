@@ -12,15 +12,14 @@ module Quebert
       def self.included(base)
         base.send(:include, InstanceMethods)
         base.send(:include, AsyncSender::Object)
+        base.send(:include, AsyncSender::Promise::DSL)
       end
       
       module InstanceMethods
-        # The meat of dealing with ActiveRecord instances.
-        def async_send(meth, *args)
-          RecordJob.new(self, meth, *args).enqueue
+        def build_job(meth, *args)
+          RecordJob.new(self, meth, *args)
         end
       end
     end
-    
   end
 end

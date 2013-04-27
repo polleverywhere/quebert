@@ -83,21 +83,42 @@ describe Quebert::Job do
         @q.drain!
       end
 
-      it "should enqueue and honor beanstalk options" do
-        user = User.new(:first_name => "Steel")
-        user.async_send(:email, "somebody", nil, nil, :beanstalk => {:priority => 1, :delay => 2, :ttr => 300})
-        job = @q.reserve
-        job.beanstalk_job.pri.should eql(1)
-        job.beanstalk_job.delay.should eql(2)
-        job.beanstalk_job.ttr.should eql(300 + Job::QUEBERT_TTR_BUFFER)
+      describe "async promise DSL" do
+        it "should enqueue and honor beanstalk options" do
+          user = User.new(:first_name => "Steel")
+          user.async(:priority => 1, :delay => 2, :ttr => 300).email("somebody", nil, nil)
+          job = @q.reserve
+          job.beanstalk_job.pri.should eql(1)
+          job.beanstalk_job.delay.should eql(2)
+          job.beanstalk_job.ttr.should eql(300 + Job::QUEBERT_TTR_BUFFER)
+        end
+
+        it "should enqueue and honor beanstalk options" do
+          User.async(:priority => 1, :delay => 2, :ttr => 300).emailizer("somebody", nil, nil)
+          job = @q.reserve
+          job.beanstalk_job.pri.should eql(1)
+          job.beanstalk_job.delay.should eql(2)
+          job.beanstalk_job.ttr.should eql(300 + Job::QUEBERT_TTR_BUFFER)
+        end
       end
 
-      it "should enqueue and honor beanstalk options" do
-        User.async_send(:emailizer, "somebody", nil, nil, :beanstalk => {:priority => 1, :delay => 2, :ttr => 300})
-        job = @q.reserve
-        job.beanstalk_job.pri.should eql(1)
-        job.beanstalk_job.delay.should eql(2)
-        job.beanstalk_job.ttr.should eql(300 + Job::QUEBERT_TTR_BUFFER)
+      describe "legacy async_send" do
+        it "should enqueue and honor beanstalk options" do
+          user = User.new(:first_name => "Steel")
+          user.async_send(:email, "somebody", nil, nil, :beanstalk => {:priority => 1, :delay => 2, :ttr => 300})
+          job = @q.reserve
+          job.beanstalk_job.pri.should eql(1)
+          job.beanstalk_job.delay.should eql(2)
+          job.beanstalk_job.ttr.should eql(300 + Job::QUEBERT_TTR_BUFFER)
+        end
+
+        it "should enqueue and honor beanstalk options" do
+          User.async_send(:emailizer, "somebody", nil, nil, :beanstalk => {:priority => 1, :delay => 2, :ttr => 300})
+          job = @q.reserve
+          job.beanstalk_job.pri.should eql(1)
+          job.beanstalk_job.delay.should eql(2)
+          job.beanstalk_job.ttr.should eql(300 + Job::QUEBERT_TTR_BUFFER)
+        end
       end
     end
   end
