@@ -24,16 +24,29 @@ describe AsyncSender::Class do
     end
   end
   
-  it "should async send class methods" do
-    Greeter.async_send(:hi, 'Jeannette')
-    @q.reserve.perform.should eql(Greeter.send(:hi, 'Jeannette'))
+  describe "#async_send" do
+    it "should async send class methods" do
+      Greeter.async_send(:hi, 'Jeannette')
+      @q.reserve.perform.should eql(Greeter.send(:hi, 'Jeannette'))
+    end
+    
+    it "should async send instance methods" do
+      Greeter.new("brad").async_send(:hi, 'stunning')
+      @q.reserve.perform.should eql(Greeter.new("brad").hi('stunning'))
+    end
   end
-  
-  it "should async send instance methods" do
-    Greeter.new("brad").async_send(:hi, 'stunning')
-    @q.reserve.perform.should eql(Greeter.new("brad").hi('stunning'))
+
+  describe "#async() promise" do
+    it "should async send class methods" do
+      Greeter.async.hi('Jeannette')
+      @q.reserve.perform.should eql(Greeter.send(:hi, 'Jeannette'))
+    end
+    
+    it "should async send instance methods" do
+      Greeter.new("brad").async.hi('stunning')
+      @q.reserve.perform.should eql(Greeter.new("brad").hi('stunning'))
+    end
   end
-  
 end
 
 describe AsyncSender::ActiveRecord do
@@ -62,27 +75,27 @@ describe AsyncSender::ActiveRecord do
   end
   
   context "unpersisted" do
-    it "should async_send instance method" do
+    it "should async instance method" do
       user = User.new do |u|
         u.email = 'barf@jones.com'
         u.first_name = "Barf"
         u.send(:write_attribute, :last_name, "Jones")
       end
-      user.async_send(:name)
+      user.async.name
       @q.reserve.perform.should eql("Barf Jones")
     end
   end
   
-  it "should async_send class method" do
+  it "should async class method" do
     email = "brad@bradgessler.com"
-    User.async_send(:emailizer, email)
+    User.async.emailizer(email)
     @q.reserve.perform.should eql(email)
   end
   
   it "should async_send and successfully serialize param object" do
     user = User.new(:first_name => 'Brad')
     user2 = User.new(:first_name => 'Steel')
-    user.async_send(:email, user2)
+    user.async.email(user2)
     @q.reserve.perform.first_name.should eql('Steel')
   end
 end

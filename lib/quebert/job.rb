@@ -14,7 +14,10 @@ module Quebert
       HIGH    = 0
     end
 
+    # Delay a job for 0 seconds on the jobqueue
     DEFAULT_JOB_DELAY = 0
+
+    # By default, the job should live for 10 seconds tops.
     DEFAULT_JOB_TTR = 10
 
     # A buffer time in seconds added to the Beanstalk TTR for Quebert to do its own job cleanup
@@ -22,10 +25,10 @@ module Quebert
     # little longer so that Quebert can bury the job or schedule a retry with the appropriate delay
     QUEBERT_TTR_BUFFER = 5
 
+    # Exceptions are used for signaling job status... ewww. Yank this out and
+    # replace with a more well thought out controller.
     NotImplemented = Class.new(StandardError)
-
     Action  = Class.new(Exception)
-
     Bury    = Class.new(Action)
     Delete  = Class.new(Action)
     Release = Class.new(Action)
@@ -33,24 +36,11 @@ module Quebert
     Retry   = Class.new(Action)
 
     def initialize(*args)
-      opts = args.last.is_a?(::Hash) ? args.pop : nil
-
       @priority = Job::Priority::MEDIUM
-      @delay = DEFAULT_JOB_DELAY
-      @ttr = DEFAULT_JOB_TTR
-
-      if opts
-        beanstalk_opts = opts.delete(:beanstalk)
-        args << opts unless opts.empty?
-
-        if beanstalk_opts
-          @priority = beanstalk_opts[:priority] if beanstalk_opts[:priority]
-          @delay = beanstalk_opts[:delay] if beanstalk_opts[:delay]
-          @ttr = beanstalk_opts[:ttr] if beanstalk_opts[:ttr]
-        end
-      end
-
-      @args = args.dup.freeze
+      @delay    = DEFAULT_JOB_DELAY
+      @ttr      = DEFAULT_JOB_TTR
+      @args     = args.dup.freeze
+      self
     end
 
     def perform(*args)

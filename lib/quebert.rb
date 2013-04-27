@@ -32,6 +32,12 @@ module Quebert
     def logger
       config.logger
     end
+
+    # Deprecation notice for code within block.
+    def deprecate(message, &block)
+      logger.warn "Quebert Deprecation Notice: #{message}"
+      block.call
+    end
   end
   
   # Register built-in Quebert backends

@@ -12,7 +12,8 @@ module Quebert
         # Its not as simple as including initialize in a class, we
         # have to do some tricks to make it work so we can put the include
         # before the initialize method as opposed to after. Ah, and thanks PivotalLabs for this.
-        base.extend ClassMethods
+        base.send(:extend, ClassMethods)
+        base.send(:include, AsyncSender::Promise::DSL)
         base.overwrite_initialize
         base.instance_eval do
           def method_added(name)
@@ -43,8 +44,8 @@ module Quebert
         end
       end
       
-      def async_send(meth, *args)
-        InstanceJob.new(self.class.name, @_init_args, meth, *args).enqueue
+      def build_job(meth, *args)
+        InstanceJob.new(self.class.name, @_init_args, meth, *args)
       end
     end
   end

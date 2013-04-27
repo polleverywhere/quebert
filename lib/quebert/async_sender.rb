@@ -4,5 +4,6 @@ module Quebert
     autoload :Instance,       'quebert/async_sender/instance'
     autoload :Class,          'quebert/async_sender/class'
     autoload :ActiveRecord,   'quebert/async_sender/active_record'
+    autoload :Promise,        'quebert/async_sender/promise'
   end
 end

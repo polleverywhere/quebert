@@ -84,9 +84,9 @@ Remember the send method in ruby?
     # ... time passes, you wait as greeter snores obnoxiously ...
     # => "Oh! Hi Brad! Good morning."
 
-What if the method takes a long time to run and you want to queue it? async_send it!
+What if the method takes a long time to run and you want to queue it? async.send it!
 
-    walmart_greeter.async_send(:sleep_and_greet, "morning")
+    walmart_greeter.async.sleep_and_greet("morning")
     # ... do some shopping and come back later when the dude wakes up
     
 Quebert figures out how to *serialize the class, throw it on a worker queue, re-instantiate it on the other side, and finish up the work.
@@ -96,7 +96,7 @@ Quebert figures out how to *serialize the class, throw it on a worker queue, re-
     
 Does it work on Class methods? Yeah, that was easier than making instance methods work:
 
-    Quebert.async_send(:budweiser_greeting, "Corey")
+    Quebert.async.budweiser_greeting("Corey")
     Quebert.backend.reserve.perform # => "waazup Corey!"
 
 * Only basic data types are included for serialization. Serializers may be customized to include support for different types.
