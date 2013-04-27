@@ -5,7 +5,6 @@ gemspec
 
 group :development do
   gem 'system_timer', :require => false, :platform => :ruby_18
-  gem 'rake'
 end
 
 group :test do
