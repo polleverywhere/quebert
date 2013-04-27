@@ -10,7 +10,7 @@ end
 group :test do
   # gem 'ruby-debug',   :platform => :ruby_18
   # gem 'ruby-debug19', :platform => :ruby_19
-  gem 'activerecord', '2.3.5'
+  gem 'activerecord', '~> 2.3.0'
   gem 'sqlite3-ruby'
   gem 'guard-rspec'
   gem 'rb-fsevent'
