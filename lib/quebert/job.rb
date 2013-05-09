@@ -40,6 +40,7 @@ module Quebert
       @delay    = DEFAULT_JOB_DELAY
       @ttr      = DEFAULT_JOB_TTR
       @args     = args.dup.freeze
+      yield self if block_given?
       self
     end
 
@@ -55,14 +56,18 @@ module Quebert
       Quebert::Timeout.timeout(@ttr, Job::Timeout){ perform(*args) }
     end
 
-    def enqueue
+    # Accepts arguments that override the job options and enqueu this stuff.
+    def enqueue(opts={})
+      opts.each { |opt, val| self.send("#{opt}=", val) }
       self.class.backend.put self, @priority, @delay, @ttr + QUEBERT_TTR_BUFFER
     end
 
+    # Serialize the job into a JSON string that we can put on the beandstalkd queue.
     def to_json
       JSON.generate(Serializer::Job.serialize(self))
     end
 
+    # Read a JSON string and convert into a hash that Ruby can deal with.
     def self.from_json(json)
       if hash = JSON.parse(json) and not hash.empty?
         Serializer::Job.deserialize(hash)

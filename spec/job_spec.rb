@@ -6,6 +6,10 @@ describe Quebert::Job do
     Adder.backend = @q = Quebert::Backend::InProcess.new
   end
 
+  it "shoud initialize with block" do
+    Adder.new(1,2,3){|a| a.priority = 8080 }.priority.should == 8080
+  end
+
   it "should perform!" do
     Adder.new(1,2,3).perform!.should eql(6)
   end
@@ -69,6 +73,25 @@ describe Quebert::Job do
       lambda{
         Adder.new(1,2,3).enqueue
       }.should change(@q, :size).by(1)
+    end
+
+    context "#enqueue options" do
+      let(:job){ Adder.new(1,2,3) }
+
+      it "should enqueue with pri" do
+        job.should_receive(:pri=).with(100)
+        job.enqueue(:pri => 100)
+      end
+
+      it "should enqueue with ttr" do
+        job.should_receive(:ttr=).with(90)
+        job.enqueue(:ttr => 90)
+      end
+
+      it "should enqueue with delay" do
+        job.should_receive(:delay=).with(80)
+        job.enqueue(:delay => 80)
+      end
     end
 
     context "beanstalk backend" do
