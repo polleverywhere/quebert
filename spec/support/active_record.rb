@@ -24,7 +24,7 @@ class User < ActiveRecord::Base
     address
   end
 
-  def email(address)
+  def email!(address)
     address
   end
 end
