@@ -22,6 +22,11 @@ def clean_file(path, contents=nil, &block)
   end
 end
 
+def redefine_constant(obj, const, value)
+  obj.send(:remove_const, const) if obj.const_defined?(const)
+  obj.const_set(const, value)
+end
+
 Dir[File.join(File.dirname(__FILE__), 'support/*.rb')].each {|file| require file }
 
 Quebert.serializers.register 'ActiveRecord::Base', Serializer::ActiveRecord

@@ -89,7 +89,7 @@ describe Controller::Beanstalk do
     sleep(3)
 
     # lets set the max retry delay so it should bury instead of delay
-    Quebert::Controller::Beanstalk::MAX_TIMEOUT_RETRY_DELAY = 1
+    redefine_constant Quebert::Controller::Beanstalk, :MAX_TIMEOUT_RETRY_DELAY, 1
     lambda{@q.reserve.perform}.should raise_exception(Quebert::Job::Timeout)
     
     @q.peek(:ready).should be_nil
