@@ -4,7 +4,6 @@ module Quebert
   autoload :Logging,            'quebert/logging'
   autoload :Serializer,         'quebert/serializer'
   autoload :Configuration,      'quebert/configuration'
-  autoload :Timeout,            'quebert/timeout'
   autoload :Job,                'quebert/job'
   autoload :Controller,         'quebert/controller'
   autoload :Backend,            'quebert/backend'
@@ -23,11 +22,11 @@ module Quebert
     def backends
       @backends ||= Support::Registry.new
     end
-    
+
     def serializers
       @serializers ||= Support::ClassRegistry.new
     end
-    
+
     # Make this easier for elsewhere in the app
     def logger
       config.logger
@@ -39,7 +38,7 @@ module Quebert
       block.call
     end
   end
-  
+
   # Register built-in Quebert backends
   Quebert.backends.register :beanstalk,       Backend::Beanstalk
   Quebert.backends.register :in_process,      Backend::InProcess

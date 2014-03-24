@@ -1,4 +1,5 @@
 require 'json'
+require 'timeout'
 
 module Quebert
   class Job
@@ -53,7 +54,7 @@ module Quebert
       # Honor the timeout and kill the job in ruby-space. Beanstalk
       # should be cleaning up this job and returning it to the queue
       # as well.
-      Quebert::Timeout.timeout(@ttr, Job::Timeout){ perform(*args) }
+      ::Timeout.timeout(@ttr, Job::Timeout){ perform(*args) }
     end
 
     # Accepts arguments that override the job options and enqueu this stuff.
