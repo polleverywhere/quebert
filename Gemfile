@@ -4,7 +4,7 @@ source "https://rubygems.org"
 gemspec
 
 group :test do
-  gem 'activerecord', '~> 2.3.0'
+  gem 'activerecord', '~> 4.0'
   gem 'sqlite3-ruby'
   gem 'guard-rspec'
   gem 'rb-fsevent'
