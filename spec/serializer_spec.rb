@@ -55,7 +55,7 @@ describe Serializer::Job do
 
     it "should have args" do
       serialized['args'][0]['payload'].should eql(100)
-      serialized['args'][1]['payload'].should == Serializer::ActiveRecord.serialize(args[1])
+      serialized['args'][1]['payload'].should eql(Serializer::ActiveRecord.serialize(args[1]))
       serialized['args'][1]['serializer'].should eql('Quebert::Serializer::ActiveRecord')
     end
 
