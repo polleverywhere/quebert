@@ -58,7 +58,7 @@ module Quebert
           hash[attr] = val
           hash
         end
-        { 'model' => record.class.model_name, 'attributes' => attrs }
+        { 'model' => record.class.model_name.to_s, 'attributes' => attrs }
       end
       
       def self.deserialize(hash)
