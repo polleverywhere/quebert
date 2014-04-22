@@ -68,7 +68,7 @@ module Quebert
           log "Manually retrying with delay"
           retry_with_delay
         rescue Exception => e
-          log "Exception caught on perform. Burrying job. #{e.inspect}", :error
+          log "Exception caught on perform. Burying job. #{e.inspect} #{e.backtrace.join("\n")}", :error
           beanstalk_job.bury
           log "Job buried", :error
           raise e
@@ -89,7 +89,7 @@ module Quebert
             beanstalk_job.release :pri => @job.priority, :delay => delay
             log "Job released"
           end
-        rescue ::Beaneater::NotFoundError => e
+        rescue ::Beaneater::NotFoundError
           log "Job ran longer than allowed. Beanstalk already deleted it!!!!", :error
           # Sometimes the timer doesn't behave correctly and this job actually runs longer than
           # allowed. At that point the beanstalk job no longer exists anymore. Lets let it go and don't blow up.
