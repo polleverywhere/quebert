@@ -1,6 +1,9 @@
 ## MAC OS
 .DS_Store
 
+## RUBY
+.bundle
+
 ## TEXTMATE
 *.tmproj
 tmtags
