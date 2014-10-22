@@ -29,12 +29,6 @@ module Quebert
     # Exceptions are used for signaling job status... ewww. Yank this out and
     # replace with a more well thought out controller.
     NotImplemented = Class.new(StandardError)
-    Action  = Class.new(Exception)
-    Bury    = Class.new(Action)
-    Delete  = Class.new(Action)
-    Release = Class.new(Action)
-    Timeout = Class.new(Action)
-    Retry   = Class.new(Action)
 
     def initialize(*args)
       @priority = Job::Priority::MEDIUM
@@ -54,7 +48,7 @@ module Quebert
       # Honor the timeout and kill the job in ruby-space. Beanstalk
       # should be cleaning up this job and returning it to the queue
       # as well.
-      ::Timeout.timeout(@ttr, Job::Timeout){ perform(*args) }
+      Timeout.timeout(@ttr){ perform(*args) }
     end
 
     # Accepts arguments that override the job options and enqueu this stuff.
@@ -85,15 +79,15 @@ module Quebert
 
   protected
     def delete!
-      raise Delete
+      @controller.delete
     end
 
     def release!
-      raise Release
+      @controller.release
     end
 
     def bury!
-      raise Bury
+      @controller.bury
     end
   end
 end

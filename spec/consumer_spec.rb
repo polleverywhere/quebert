@@ -78,7 +78,7 @@ describe Controller::Beanstalk do
     job = @q.reserve
     job.beanstalk_job.stats["releases"].should eql(0)
     job.beanstalk_job.stats["delay"].should eql(0)
-    lambda{job.perform}.should raise_exception(Quebert::Job::Timeout)
+    lambda{job.perform}.should raise_exception(Timeout::Error)
     
     @q.peek(:ready).should be_nil
     beanstalk_job = @q.peek(:delayed)
@@ -90,7 +90,7 @@ describe Controller::Beanstalk do
 
     # lets set the max retry delay so it should bury instead of delay
     redefine_constant Quebert::Controller::Beanstalk, :MAX_TIMEOUT_RETRY_DELAY, 1
-    lambda{@q.reserve.perform}.should raise_exception(Quebert::Job::Timeout)
+    lambda{@q.reserve.perform}.should raise_exception(Timeout::Error)
     
     @q.peek(:ready).should be_nil
     @q.peek(:delayed).should be_nil

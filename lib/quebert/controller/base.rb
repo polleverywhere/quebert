@@ -10,11 +10,16 @@ module Quebert
       end
       
       def perform
-        begin
-          job.perform!
-        rescue Job::Action
-          # Nothing to do chief!
-        end
+        job.perform!
+      end
+
+      def delete
+      end
+
+      def release
+      end
+
+      def bury
       end
     end
   end

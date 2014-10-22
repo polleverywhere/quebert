@@ -23,7 +23,7 @@ class TimeoutJob < Quebert::Job
   end
 
   def perform
-    # 10 second task should definitely raise a Job::Timeout exception
+    # 10 second task should definitely raise a Timeout::Error exception
     sleep(10)
   end
 end

@@ -150,7 +150,7 @@ describe Quebert::Job do
     it "should respect TTR option" do
       lambda {
         TimeoutJob.new.perform!
-      }.should raise_exception(Quebert::Job::Timeout)
+      }.should raise_exception(Timeout::Error)
     end
   end
 end

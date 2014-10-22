@@ -15,20 +15,29 @@ module Quebert
       def initialize(beanstalk_job, queue)
         @beanstalk_job, @queue = beanstalk_job, queue
         @job = Job.from_json(beanstalk_job.body)
-      rescue Job::Delete
-        beanstalk_job.delete
-        log "Deleted on initialization", :error
-      rescue Job::Release
-        beanstalk_job.release @job.priority, @job.delay
-        log "Released on initialization with priority: #{@job.priority} and delay: #{@job.delay}", :error
-      rescue Job::Bury
-        beanstalk_job.bury
-        log "Buried on initialization", :error
+        @job.instance_variable_set('@controller', self)
       rescue Exception => e
         beanstalk_job.bury
         log "Exception caught on initialization. #{e.inspect}", :error
         raise
       end
+
+      def delete
+        beanstalk_job.delete
+        log "Deleted on initialization", :error
+      end
+
+      def release
+        beanstalk_job.release :pri => @job.priority, :delay => @job.delay
+        log "Released on initialization with priority: #{@job.priority} and delay: #{@job.delay}", :error
+      end
+
+      def bury
+        beanstalk_job.bury
+        log "Buried on initialization", :error
+      end
+
+
 
       def perform
         log "Performing with args #{job.args.inspect}"
@@ -42,27 +51,10 @@ module Quebert
 
         log "Completed in #{(time*1000*1000).to_i/1000.to_f} ms\n"
         result
-      rescue Job::Delete
-        log "Deleting job", :error
-        beanstalk_job.delete
-        log "Job deleted", :error
-      rescue Job::Release
-        log "Releasing with priority: #{@job.priority} and delay: #{@job.delay}", :error
-        beanstalk_job.release :pri => @job.priority, :delay => @job.delay
-        log "Job released", :error
-      rescue Job::Bury
-        log "Burrying job", :error
-        beanstalk_job.bury
-        log "Job burried", :error
-      rescue Job::Timeout => e
+      rescue Timeout::Error => e
         log "Job timed out. Retrying with delay. #{e.inspect} #{e.backtrace.join("\n")}", :error
         retry_with_delay
         raise
-      rescue Job::Retry
-        # The difference between the Retry and Timeout class is that
-        # Retry does not log an exception where as Timeout does
-        log "Manually retrying with delay"
-        retry_with_delay
       rescue Exception => e
         log "Exception caught on perform. Burying job. #{e.inspect} #{e.backtrace.join("\n")}", :error
         beanstalk_job.bury
