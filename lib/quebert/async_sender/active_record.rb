@@ -6,7 +6,7 @@ module Quebert
         def perform(record, meth, *args)
           record.send(meth, *args)
         ensure
-          ActiveRecord::Base.clear_active_connections!
+          ::ActiveRecord::Base.clear_active_connections!
         end
       end
 
