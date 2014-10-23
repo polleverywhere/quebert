@@ -51,16 +51,16 @@ module Quebert
 
     # Runs the perform method that somebody else should be implementing
     def perform!
-      Quebert.configuration.before_job(self)
-      Quebert.configuration.around_job(self)
+      Quebert.config.before_job(self)
+      Quebert.config.around_job(self)
 
       # Honor the timeout and kill the job in ruby-space. Beanstalk
       # should be cleaning up this job and returning it to the queue
       # as well.
       val = ::Timeout.timeout(@ttr, Job::Timeout){ perform(*args) }
 
-      Quebert.configuration.around_job(self)
-      Quebert.configuration.after_job(self)
+      Quebert.config.around_job(self)
+      Quebert.config.after_job(self)
 
       val
     end

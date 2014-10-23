@@ -164,15 +164,15 @@ describe Quebert::Job do
         Adder.new(i, i)
       end
 
-      Quebert.configuration.before_job do |job|
+      Quebert.config.before_job do |job|
         before_jobs << job
       end
 
-      Quebert.configuration.after_job do |job|
+      Quebert.config.after_job do |job|
         after_jobs << job
       end
 
-      Quebert.configuration.around_job do |job|
+      Quebert.config.around_job do |job|
         around_jobs << job
       end
 
