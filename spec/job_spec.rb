@@ -153,4 +153,35 @@ describe Quebert::Job do
       }.should raise_exception(Quebert::Job::Timeout)
     end
   end
+
+  context "before, after & around hooks" do
+    it "should call each type of hook as expected" do
+      before_jobs = []
+      after_jobs  = []
+      around_jobs = []
+
+      jobs = (1..10).map do |i|
+        Adder.new(i, i)
+      end
+
+      Quebert.configuration.before_job do |job|
+        before_jobs << job
+      end
+
+      Quebert.configuration.after_job do |job|
+        after_jobs << job
+      end
+
+      Quebert.configuration.around_job do |job|
+        around_jobs << job
+      end
+
+      jobs.each(&:perform!)
+
+      before_jobs.should eql jobs
+      after_jobs.should  eql jobs
+      # around_job hooks are called twice per job (before & after its performed)
+      around_jobs.should eql jobs.zip(jobs).flatten
+    end
+  end
 end

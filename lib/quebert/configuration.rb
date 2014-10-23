@@ -29,13 +29,60 @@ module Quebert
       end
       self
     end
-    
+
     def worker
       @worker ||= Struct.new(:exception_handler).new
     end
-    
+
     def self.from_hash(hash)
       new.from_hash(hash) # Config this puppy up from a config hash
+    end
+
+    def before_job(job = nil, &block)
+      if job
+        before_hooks.each do |h|
+          h.call(job)
+        end
+      else
+        before_hooks << block if block
+      end
+      self
+    end
+
+    def after_job(job = nil, &block)
+      if job
+        after_hooks.each do |h|
+          h.call(job)
+        end
+      else
+        after_hooks << block if block
+      end
+      self
+    end
+
+    def around_job(job = nil, &block)
+      if job
+        around_hooks.each do |h|
+          h.call(job)
+        end
+      else
+        around_hooks << block if block
+      end
+      self
+    end
+
+    private
+
+    def before_hooks
+      @before_hooks ||= []
+    end
+
+    def after_hooks
+      @after_hooks ||= []
+    end
+
+    def around_hooks
+      @around_hooks ||= []
     end
   end
 end
