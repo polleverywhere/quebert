@@ -18,6 +18,7 @@ Quebert is a serious project. Its used in a production environment at Poll Every
 * Rails/ActiveRecord integration similar to async_observer
 * Pluggable exception handling (for Hoptoad integration)
 * Run workers with pid, log, and config files. These do not daemonize (do it yourself punk!)
+* Provide custom hooks to be called before, after & around jobs are run
 
 Some features that are currently missing that I will soon add include:
 
@@ -52,6 +53,25 @@ Then perform the jobs!
 
     Quebert.backend.reserve.perform # => 6
     Quebert.backend.reserve.perform # => 15
+
+## Before/After/Around Hooks
+
+Quebert has support for providing custom hooks to be called before, after & around your jobs are being run.
+A common example is making sure that any active ActiveRecord database connections are put back on the connection pool after a job is done:
+
+    Quebert.config.after_job do
+      ActiveRecord::Base.clear_active_connections!
+    end
+
+    Quebert.config.before_job do |job|
+      # all hooks take an optional job argument
+      # in case you want to do something with that job
+    end
+
+    Quebert.config.around_job do |job|
+      # this hook gets called twice
+      # once before & once after a job is performed
+    end
 
 ## Async Sender
 
