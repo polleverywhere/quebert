@@ -51,6 +51,14 @@ describe Backend::Beanstalk  do
       @q.reserve.perform.should eql(num)
     end
   end
+
+  it "should consume from multiple queues" do
+    @q.queues = ['a', 'b']
+    @q.tube('a').put Adder.new(1)
+    @q.tube('b').put Adder.new(2)
+    @q.reserve.perform.should eql(1)
+    @q.reserve.perform.should eql(2)
+  end
 end
 
 describe Backend::Sync do
