@@ -20,13 +20,13 @@ describe Worker do
 
     it "should default to Quebert.config.worker.exception_handler handler" do
       @q.put Exceptional.new
-      Quebert.config.worker.exception_handler = Proc.new{|e, opts| e.should be_instance_of(Exception) }
+      Quebert.config.worker.exception_handler = Proc.new{|e, opts| e.should be_a(StandardError) }
       lambda{ @w.start }.should_not raise_exception
     end
 
     it "should intercept exceptions" do
       @q.put Exceptional.new
-      @w.exception_handler = Proc.new{|e, opts| e.should be_instance_of(Exception) }
+      @w.exception_handler = Proc.new{|e, opts| e.should be_a(StandardError) }
       lambda{ @w.start }.should_not raise_exception
     end
   end

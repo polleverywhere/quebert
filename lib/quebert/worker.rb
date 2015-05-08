@@ -2,9 +2,10 @@ module Quebert
   class Worker
     include Logging
 
-    attr_accessor :exception_handler, :backend
+    attr_accessor :exception_handler, :backend, :queues
 
     def initialize
+      @queues = []
       yield self if block_given?
     end
 
@@ -14,10 +15,15 @@ module Quebert
       Signal.trap('INT') { safe_stop }
 
       logger.info "Worker started with #{backend.class.name} backend\n"
+
+      if backend.respond_to?(:queues=)
+        backend.queues = queues
+      end
+
       while @controller = backend.reserve do
         begin
           @controller.perform
-        rescue Exception => error
+        rescue => error
           if exception_handler
             exception_handler.call(
               error,
@@ -26,7 +32,7 @@ module Quebert
               :worker => self
             )
           else
-            raise error
+            raise
           end
         end
         @controller = nil

@@ -36,6 +36,6 @@ end
 
 class Exceptional < Quebert::Job
   def perform
-    raise Exception
+    fail
   end
 end

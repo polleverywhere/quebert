@@ -28,6 +28,7 @@ module Quebert
                                     "(default: #{@options[:pid]})")                   { |file| @options[:pid] = file }
         opts.on("-C", "--config FILE", "Load options from config file")               { |file| @options[:config] = file }
         opts.on("-c", "--chdir DIR", "Change to dir before starting")                 { |dir| @options[:chdir] = File.expand_path(dir) }
+        opts.on("-q", "--queues LIST", "Specify queue name(s)")                       { |list| @options[:queues] = list.split(",") }
       end
     end
 
@@ -58,7 +59,9 @@ module Quebert
         require config
       end
 
-      Worker.new.start
+      worker = Worker.new
+      worker.queues = params[:queues] if params[:queues]
+      worker.start
     end
 
   private
