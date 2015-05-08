@@ -24,9 +24,9 @@ module Quebert
       rescue Job::Bury
         beanstalk_job.bury
         log "Buried on initialization", :error
-      rescue Exception => e
+      rescue => e
         beanstalk_job.bury
-        log "Exception caught on initialization. #{e.inspect}", :error
+        log "Error caught on initialization. #{e.inspect}", :error
         raise
       end
 
@@ -63,8 +63,8 @@ module Quebert
         # Retry does not log an exception where as Timeout does
         log "Manually retrying with delay"
         retry_with_delay
-      rescue Exception => e
-        log "Exception caught on perform. Burying job. #{e.inspect} #{e.backtrace.join("\n")}", :error
+      rescue => e
+        log "Error caught on perform. Burying job. #{e.inspect} #{e.backtrace.join("\n")}", :error
         beanstalk_job.bury
         log "Job buried", :error
         raise
