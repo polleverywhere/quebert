@@ -57,7 +57,7 @@ module Quebert
       # Honor the timeout and kill the job in ruby-space. Beanstalk
       # should be cleaning up this job and returning it to the queue
       # as well.
-      val = ::Timeout.timeout(@ttr, Job::Timeout){ perform(*args) }
+      val = ::Timeout.timeout(ttr, Job::Timeout){ perform(*args) }
 
       Quebert.config.around_job(self)
       Quebert.config.after_job(self)
@@ -68,7 +68,7 @@ module Quebert
     # Accepts arguments that override the job options and enqueu this stuff.
     def enqueue(opts={})
       opts.each { |opt, val| self.send("#{opt}=", val) }
-      self.class.backend.put self, @priority, @delay, @ttr + QUEBERT_TTR_BUFFER
+      backend.put(self, priority, delay, ttr + QUEBERT_TTR_BUFFER)
     end
 
     # Serialize the job into a JSON string that we can put on the beandstalkd queue.
@@ -85,6 +85,10 @@ module Quebert
 
     def self.backend=(backend)
       @backend = backend
+    end
+
+    def backend
+      self.class.backend
     end
 
     def self.backend
