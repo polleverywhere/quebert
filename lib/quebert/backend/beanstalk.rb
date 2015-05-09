@@ -61,11 +61,14 @@ module Quebert
       end
 
       def watch_tubes
-        logger.info "Watching beanstalkd tubes #{watched_tube_names.inspect}"
-        connection.tubes.watch!(*watched_tube_names)
+        if tube_names != @watched_tube_names
+          @watched_tube_names = tube_names
+          logger.info "Watching beanstalkd tubes #{@watched_tube_names.inspect}"
+          connection.tubes.watch!(*@watched_tube_names)
+        end
       end
 
-      def watched_tube_names
+      def tube_names
         queues.empty? ? [default_tube_name] : queues
       end
     end
