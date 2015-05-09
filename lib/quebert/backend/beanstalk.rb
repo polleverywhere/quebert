@@ -6,6 +6,7 @@ module Quebert
     # Manage jobs on a Beanstalk queue out of process
     class Beanstalk
       extend Forwardable
+      include Logging
 
       attr_reader :host, :default_tube_name
       attr_accessor :queues
@@ -60,6 +61,7 @@ module Quebert
       end
 
       def watch_tubes
+        logger.info "Watching beanstalkd tubes #{watched_tube_names.inspect}"
         connection.tubes.watch!(*watched_tube_names)
       end
 
