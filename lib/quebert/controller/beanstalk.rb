@@ -6,14 +6,14 @@ module Quebert
     class Beanstalk < Base
       include Logging
 
-      attr_reader :beanstalk_job, :queue, :job
+      attr_reader :beanstalk_job, :job
 
       MAX_TIMEOUT_RETRY_DELAY = 300
       TIMEOUT_RETRY_DELAY_SEED = 2
       TIMEOUT_RETRY_GROWTH_RATE = 3
 
-      def initialize(beanstalk_job, queue)
-        @beanstalk_job, @queue = beanstalk_job, queue
+      def initialize(beanstalk_job)
+        @beanstalk_job = beanstalk_job
         @job = Job.from_json(beanstalk_job.body)
       rescue Job::Delete
         beanstalk_job.delete

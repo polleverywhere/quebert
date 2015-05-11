@@ -8,30 +8,30 @@ module Quebert
       extend Forwardable
       include Logging
 
-      attr_reader :host, :default_tube_name
-      attr_accessor :queues
+      attr_reader :host, :default_queue_name
+      attr_writer :queue_names
 
-      def initialize(host, default_tube_name)
-        @host, @default_tube_name = host, default_tube_name
-        @queues = []
+      def initialize(host, default_queue_name)
+        @host = host
+        @default_queue_name = default_queue_name
+        @queue_names = []
       end
 
       def self.configure(opts = {})
-        opts[:host] ||= ['127.0.0.1:11300']
-        new(opts[:host], opts[:tube])
+        new(opts.fetch(:host, "127.0.0.1:11300"), opts.fetch(:default_queue))
       end
 
-      def tube(tube_name)
-        Tube.new(connection.tubes[tube_name])
+      def queue(queue_name)
+        Queue.new(beanstalkd_tubes[queue_name])
       end
 
       def reserve_without_controller(timeout=nil)
-        watch_tubes
-        connection.tubes.reserve(timeout)
+        watch_queues
+        beanstalkd_tubes.reserve(timeout)
       end
 
       def reserve(timeout=nil)
-        Controller::Beanstalk.new(reserve_without_controller(timeout), self)
+        Controller::Beanstalk.new(reserve_without_controller(timeout))
       end
 
       # For testing purposes... I think there's a better way to do this though.
@@ -43,53 +43,57 @@ module Quebert
           reserve_without_controller.delete
         end
         while peek(:buried) do
-          default_tube.kick
+          default_queue.kick
           reserve_without_controller.delete
         end
       end
 
-      def_delegators :default_tube, :put, :peek
+      def_delegators :default_queue, :put, :peek
 
       private
 
-      def default_tube
-        @default_tube ||= tube(default_tube_name)
+      def default_queue
+        @default_queue ||= queue(default_queue_name)
       end
 
-      def connection
-        @connection ||= Beaneater.new(host)
+      def beanstalkd_connection
+        @beanstalkd_connection ||= Beaneater.new(host)
       end
 
-      def watch_tubes
-        if tube_names != @watched_tube_names
-          @watched_tube_names = tube_names
-          logger.info "Watching beanstalkd tubes #{@watched_tube_names.inspect}"
-          connection.tubes.watch!(*@watched_tube_names)
+      def beanstalkd_tubes
+        beanstalkd_connection.tubes
+      end
+
+      def watch_queues
+        if queue_names != @watched_queue_names
+          @watched_queue_names = queue_names
+          logger.info "Watching beanstalkd queues #{@watched_queue_names.inspect}"
+          beanstalkd_tubes.watch!(*@watched_queue_names)
         end
       end
 
-      def tube_names
-        queues.empty? ? [default_tube_name] : queues
+      def queue_names
+        @queue_names.empty? ? [default_queue_name] : @queue_names
       end
     end
 
-    class Beanstalk::Tube
+    class Beanstalk::Queue
       extend Forwardable
-      attr_reader :tube
-      def initialize(tube)
-        @tube = tube
+      attr_reader :beanstalkd_tube
+      def initialize(beanstalkd_tube)
+        @beanstalkd_tube = beanstalkd_tube
       end
 
       def put(job, *args)
         priority, delay, ttr = args
         opts = {}
-        opts[:pri]   = priority unless priority.nil?
-        opts[:delay] = delay    unless delay.nil?
-        opts[:ttr]   = ttr      unless ttr.nil?
-        tube.put job.to_json, opts
+        opts[:pri]   = priority if priority
+        opts[:delay] = delay    if delay
+        opts[:ttr]   = ttr      if ttr
+        beanstalkd_tube.put(job.to_json, opts)
       end
 
-      def_delegators :tube, :peek, :kick
+      def_delegators :beanstalkd_tube, :peek, :kick
     end
   end
 end

@@ -2,10 +2,10 @@ module Quebert
   class Worker
     include Logging
 
-    attr_accessor :exception_handler, :backend, :queues
+    attr_accessor :exception_handler, :backend, :queue_names
 
     def initialize
-      @queues = []
+      @queue_names = []
       yield self if block_given?
     end
 
@@ -16,8 +16,8 @@ module Quebert
 
       logger.info "Worker started with #{backend.class.name} backend\n"
 
-      if backend.respond_to?(:queues=)
-        backend.queues = queues
+      if backend.respond_to?(:queue_names=)
+        backend.queue_names = queue_names
       end
 
       while @controller = backend.reserve do

@@ -66,8 +66,8 @@ module Quebert
     end
 
     # Accepts arguments that override the job options and enqueu this stuff.
-    def enqueue(opts={})
-      opts.each { |opt, val| self.send("#{opt}=", val) }
+    def enqueue(override_opts={})
+      override_opts.each { |opt, val| self.send("#{opt}=", val) }
       backend.put(self, priority, delay, ttr + QUEBERT_TTR_BUFFER)
     end
 
