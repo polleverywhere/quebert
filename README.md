@@ -120,3 +120,9 @@ Does it work on Class methods? Yeah, that was easier than making instance method
     Quebert.backend.reserve.perform # => "waazup Coraline!"
 
 * Only basic data types are included for serialization. Serializers may be customized to include support for different types.
+
+## Backends
+
+* Beanstalk: Enqueue jobs in a beanstalkd service. The workers run in a separate process. Typically used in production environments.
+* Sync: Perform jobs immediately upon enqueuing. Typically used in testing environments.
+* InProcess: Enqueue jobs in an in-memory array. A worker will need to reserve a job to perform.
