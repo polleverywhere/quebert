@@ -1,6 +1,6 @@
 # Quebert
 
-[![Build Status](https://travis-ci.org/polleverywhere/quebert.png?branch=master)](https://travis-ci.org/polleverywhere/quebert)
+[![Build Status](https://travis-ci.org/polleverywhere/quebert.png?branch=master)](https://travis-ci.org/polleverywhere/quebert) [![Code Climate](https://codeclimate.com/repos/555266fc6956805b9e0033b5/badges/008e51483e8e268f21db/gpa.svg)](https://codeclimate.com/repos/555266fc6956805b9e0033b5/feed)
 
 async_observer is great, but is dated and doesn't really support running jobs outside of the async_send idiom. Quebert is an attempt to mix how jobs are run in other popular worker queue frameworks, like resque and dj, with async_observer so that you can have it both ways.
 
