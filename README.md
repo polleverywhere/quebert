@@ -116,7 +116,7 @@ Quebert figures out how to *serialize the class, throw it on a worker queue, re-
     
 Does it work on Class methods? Yeah, that was easier than making instance methods work:
 
-    Quebert.async.budweiser_greeting("Corey")
-    Quebert.backend.reserve.perform # => "waazup Corey!"
+    Quebert.async.budweiser_greeting("Coraline")
+    Quebert.backend.reserve.perform # => "waazup Coraline!"
 
 * Only basic data types are included for serialization. Serializers may be customized to include support for different types.
