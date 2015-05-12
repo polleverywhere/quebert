@@ -17,22 +17,22 @@ module Quebert
         @job = Job.from_json(beanstalk_job.body)
       rescue Job::Delete
         beanstalk_job.delete
-        log "Deleted on initialization", :error
+        job_log "Deleted on initialization", :error
       rescue Job::Release
-        beanstalk_job.release @job.priority, @job.delay
-        log "Released on initialization with priority: #{@job.priority} and delay: #{@job.delay}", :error
+        beanstalk_job.release job.priority, job.delay
+        job_log "Released on initialization with priority: #{job.priority} and delay: #{job.delay}", :error
       rescue Job::Bury
         beanstalk_job.bury
-        log "Buried on initialization", :error
+        job_log "Buried on initialization", :error
       rescue => e
         beanstalk_job.bury
-        log "Error caught on initialization. #{e.inspect}", :error
+        job_log "Error caught on initialization. #{e.inspect}", :error
         raise
       end
 
       def perform
-        log "Performing with args #{job.args.inspect}"
-        log "Beanstalk Job Stats: #{beanstalk_job.stats.inspect}"
+        job_log "Performing with args #{job.args.inspect}"
+        job_log "Beanstalk Job Stats: #{beanstalk_job.stats.inspect}"
 
         result = false
         time = Benchmark.realtime do
@@ -40,33 +40,33 @@ module Quebert
           beanstalk_job.delete
         end
 
-        log "Completed in #{(time*1000*1000).to_i/1000.to_f} ms\n"
+        job_log "Completed in #{(time*1000*1000).to_i/1000.to_f} ms\n"
         result
       rescue Job::Delete
-        log "Deleting job", :error
+        job_log "Deleting job", :error
         beanstalk_job.delete
-        log "Job deleted", :error
+        job_log "Job deleted", :error
       rescue Job::Release
-        log "Releasing with priority: #{@job.priority} and delay: #{@job.delay}", :error
-        beanstalk_job.release :pri => @job.priority, :delay => @job.delay
-        log "Job released", :error
+        job_log "Releasing with priority: #{job.priority} and delay: #{job.delay}", :error
+        beanstalk_job.release :pri => job.priority, :delay => job.delay
+        job_log "Job released", :error
       rescue Job::Bury
-        log "Burrying job", :error
+        job_log "Burrying job", :error
         beanstalk_job.bury
-        log "Job burried", :error
+        job_log "Job burried", :error
       rescue Job::Timeout => e
-        log "Job timed out. Retrying with delay. #{e.inspect} #{e.backtrace.join("\n")}", :error
+        job_log "Job timed out. Retrying with delay. #{e.inspect} #{e.backtrace.join("\n")}", :error
         retry_with_delay
         raise
       rescue Job::Retry
         # The difference between the Retry and Timeout class is that
-        # Retry does not log an exception where as Timeout does
-        log "Manually retrying with delay"
+        # Retry does not job_log an exception where as Timeout does
+        job_log "Manually retrying with delay"
         retry_with_delay
       rescue => e
-        log "Error caught on perform. Burying job. #{e.inspect} #{e.backtrace.join("\n")}", :error
+        job_log "Error caught on perform. Burying job. #{e.inspect} #{e.backtrace.join("\n")}", :error
         beanstalk_job.bury
-        log "Job buried", :error
+        job_log "Job buried", :error
         raise
       end
 
@@ -75,23 +75,27 @@ module Quebert
         delay = TIMEOUT_RETRY_DELAY_SEED + TIMEOUT_RETRY_GROWTH_RATE**beanstalk_job.stats["releases"].to_i
 
         if delay > MAX_TIMEOUT_RETRY_DELAY
-          log "Max retry delay exceeded. Burrying job"
+          job_log "Max retry delay exceeded. Burrying job"
           beanstalk_job.bury
-          log "Job burried"
+          job_log "Job burried"
         else
-          log "TTR exceeded. Releasing with priority: #{@job.priority} and delay: #{delay}"
-          beanstalk_job.release :pri => @job.priority, :delay => delay
-          log "Job released"
+          job_log "TTR exceeded. Releasing with priority: #{job.priority} and delay: #{delay}"
+          beanstalk_job.release :pri => job.priority, :delay => delay
+          job_log "Job released"
         end
       rescue ::Beaneater::NotFoundError
-        log "Job ran longer than allowed. Beanstalk already deleted it!!!!", :error
+        job_log "Job ran longer than allowed. Beanstalk already deleted it!!!!", :error
         # Sometimes the timer doesn't behave correctly and this job actually runs longer than
         # allowed. At that point the beanstalk job no longer exists anymore. Lets let it go and don't blow up.
       end
 
-      def log(message, level=:info)
+      def job_log(message, level=:info)
         # Have the job write to the log file so that we catch the details of the job
-        job.send(:log, message, level)
+        if job
+          job.send(:log, message, level)
+        else
+          Quebert.logger.send(level, message)
+        end
       end
     end
   end

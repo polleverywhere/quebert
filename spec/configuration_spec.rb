@@ -6,7 +6,7 @@ describe Configuration do
       @config = Configuration.new.from_hash(
         "backend" => "beanstalk",
         "host" => "localhost:11300",
-        "default_queue" => "quebert-config-test")
+        "queue" => "quebert-config-test")
     end
 
     it "should configure backend" do
@@ -15,7 +15,7 @@ describe Configuration do
       # Blech, gross nastiness in their lib, but we need to look in to see if this stuff as configed
       backend.send(:beanstalkd_connection).connection.host.should eql("localhost")
       backend.send(:beanstalkd_connection).connection.port.should eql(11300)
-      backend.send(:default_queue).beanstalkd_tube.name.should eql("quebert-config-test")
+      backend.send(:default_tube).name.should eql("quebert-config-test")
     end
   end
 end

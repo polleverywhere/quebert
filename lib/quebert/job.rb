@@ -6,7 +6,7 @@ module Quebert
     include Logging
 
     attr_reader :args
-    attr_accessor :priority, :delay, :ttr
+    attr_accessor :priority, :delay, :ttr, :queue
 
     # Prioritize Quebert jobs as specified in https://github.com/kr/beanstalkd/blob/master/doc/protocol.txt.
     class Priority
@@ -20,11 +20,6 @@ module Quebert
 
     # By default, the job should live for 10 seconds tops.
     DEFAULT_JOB_TTR = 10
-
-    # A buffer time in seconds added to the Beanstalk TTR for Quebert to do its own job cleanup
-    # The job will perform based on the Beanstalk TTR, but Beanstalk hangs on to the job just a
-    # little longer so that Quebert can bury the job or schedule a retry with the appropriate delay
-    QUEBERT_TTR_BUFFER = 5
 
     # Exceptions are used for signaling job status... ewww. Yank this out and
     # replace with a more well thought out controller.
@@ -68,7 +63,7 @@ module Quebert
     # Accepts arguments that override the job options and enqueu this stuff.
     def enqueue(override_opts={})
       override_opts.each { |opt, val| self.send("#{opt}=", val) }
-      backend.put(self, priority, delay, ttr + QUEBERT_TTR_BUFFER)
+      backend.put(self)
     end
 
     # Serialize the job into a JSON string that we can put on the beandstalkd queue.

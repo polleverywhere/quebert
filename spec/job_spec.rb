@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Quebert::Job do
-  
+
   before(:all) do
     Adder.backend = @q = Quebert::Backend::InProcess.new
   end
@@ -13,23 +13,26 @@ describe Quebert::Job do
   it "should perform!" do
     Adder.new(1,2,3).perform!.should eql(6)
   end
-  
+
   it "should perform 0 arg jobs" do
     Adder.new.perform!.should eql(0)
   end
-  
+
   it "should raise not implemented on base job" do
     lambda {
       Job.new.perform
     }.should raise_exception(Quebert::Job::NotImplemented)
   end
-  
+
   it "should convert job to and from JSON" do
     args = [1,2,3]
-    serialized = Adder.new(*args).to_json
+    job = Adder.new(*args)
+    job.queue = "foo"
+    serialized = job.to_json
     unserialized = Adder.from_json(serialized)
-    unserialized.should be_instance_of(Adder)
+    unserialized.should be_a(Adder)
     unserialized.args.should eql(args)
+    unserialized.queue.should eql("foo")
   end
 
   it "should have default MEDIUM priority" do
@@ -54,20 +57,20 @@ describe Quebert::Job do
         ReleaseJob.new.perform
       }.should raise_exception(Job::Release)
     end
-    
+
     it "should raise delete" do
       lambda{
         DeleteJob.new.perform
       }.should raise_exception(Job::Delete)
     end
-    
+
     it "should raise bury" do
       lambda{
         BuryJob.new.perform
       }.should raise_exception(Job::Bury)
     end
   end
-  
+
   context "job queue" do
     it "should enqueue" do
       lambda{
@@ -113,7 +116,7 @@ describe Quebert::Job do
           job = @q.reserve
           job.beanstalk_job.pri.should eql(1)
           job.beanstalk_job.delay.should eql(2)
-          job.beanstalk_job.ttr.should eql(300 + Job::QUEBERT_TTR_BUFFER)
+          job.beanstalk_job.ttr.should eql(300 + Quebert::Backend::Beanstalk::TTR_BUFFER)
         end
 
         it "should enqueue and honor beanstalk options" do
@@ -121,7 +124,7 @@ describe Quebert::Job do
           job = @q.reserve
           job.beanstalk_job.pri.should eql(1)
           job.beanstalk_job.delay.should eql(2)
-          job.beanstalk_job.ttr.should eql(300 + Job::QUEBERT_TTR_BUFFER)
+          job.beanstalk_job.ttr.should eql(300 + Quebert::Backend::Beanstalk::TTR_BUFFER)
         end
       end
 
@@ -132,7 +135,7 @@ describe Quebert::Job do
           job = @q.reserve
           job.beanstalk_job.pri.should eql(1)
           job.beanstalk_job.delay.should eql(2)
-          job.beanstalk_job.ttr.should eql(300 + Job::QUEBERT_TTR_BUFFER)
+          job.beanstalk_job.ttr.should eql(300 + Quebert::Backend::Beanstalk::TTR_BUFFER)
         end
 
         it "should enqueue and honor beanstalk options" do
@@ -140,12 +143,12 @@ describe Quebert::Job do
           job = @q.reserve
           job.beanstalk_job.pri.should eql(1)
           job.beanstalk_job.delay.should eql(2)
-          job.beanstalk_job.ttr.should eql(300 + Job::QUEBERT_TTR_BUFFER)
+          job.beanstalk_job.ttr.should eql(300 + Quebert::Backend::Beanstalk::TTR_BUFFER)
         end
       end
     end
   end
-  
+
   context "Timeout" do
     it "should respect TTR option" do
       lambda {

@@ -8,25 +8,27 @@ module Quebert
       extend Forwardable
       include Logging
 
-      attr_reader :host, :default_queue_name
-      attr_writer :queue_names
+      # A buffer time in seconds added to the Beanstalk TTR for Quebert to do
+      # its own job cleanup The job will perform based on the Beanstalk TTR,
+      # but Beanstalk hangs on to the job just a little longer so that Quebert
+      # can bury the job or schedule a retry with the appropriate delay
+      TTR_BUFFER = 5
 
-      def initialize(host, default_queue_name)
+      attr_reader :host, :queue
+      attr_writer :queues
+
+      def initialize(host, queue)
         @host = host
-        @default_queue_name = default_queue_name
-        @queue_names = []
+        @queue = queue
+        @queues = []
       end
 
       def self.configure(opts = {})
-        new(opts.fetch(:host, "127.0.0.1:11300"), opts.fetch(:default_queue))
-      end
-
-      def queue(queue_name)
-        Queue.new(beanstalkd_tubes[queue_name])
+        new(opts.fetch(:host, "127.0.0.1:11300"), opts.fetch(:queue))
       end
 
       def reserve_without_controller(timeout=nil)
-        watch_queues
+        watch_tubes
         beanstalkd_tubes.reserve(timeout)
       end
 
@@ -43,17 +45,26 @@ module Quebert
           reserve_without_controller.delete
         end
         while peek(:buried) do
-          default_queue.kick
+          kick
           reserve_without_controller.delete
         end
       end
 
-      def_delegators :default_queue, :put, :peek
+      # TODO add a queue param?
+      def_delegators :default_tube, :peek, :kick
+
+      def put(job)
+        tube = beanstalkd_tubes[job.queue || queue]
+        tube.put(job.to_json,
+          :pri => job.priority,
+          :delay => job.delay,
+          :ttr => job.ttr + TTR_BUFFER)
+      end
 
       private
 
-      def default_queue
-        @default_queue ||= queue(default_queue_name)
+      def default_tube
+        @default_tube ||= beanstalkd_tubes[queue]
       end
 
       def beanstalkd_connection
@@ -64,36 +75,17 @@ module Quebert
         beanstalkd_connection.tubes
       end
 
-      def watch_queues
-        if queue_names != @watched_queue_names
-          @watched_queue_names = queue_names
-          logger.info "Watching beanstalkd queues #{@watched_queue_names.inspect}"
-          beanstalkd_tubes.watch!(*@watched_queue_names)
+      def watch_tubes
+        if queues != @watched_tube_names
+          @watched_tube_names = queues
+          logger.info "Watching beanstalkd queues #{@watched_tube_names.inspect}"
+          beanstalkd_tubes.watch!(*@watched_tube_names)
         end
       end
 
-      def queue_names
-        @queue_names.empty? ? [default_queue_name] : @queue_names
+      def queues
+        @queues.empty? ? [queue] : @queues
       end
-    end
-
-    class Beanstalk::Queue
-      extend Forwardable
-      attr_reader :beanstalkd_tube
-      def initialize(beanstalkd_tube)
-        @beanstalkd_tube = beanstalkd_tube
-      end
-
-      def put(job, *args)
-        priority, delay, ttr = args
-        opts = {}
-        opts[:pri]   = priority if priority
-        opts[:delay] = delay    if delay
-        opts[:ttr]   = ttr      if ttr
-        beanstalkd_tube.put(job.to_json, opts)
-      end
-
-      def_delegators :beanstalkd_tube, :peek, :kick
     end
   end
 end

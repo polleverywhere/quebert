@@ -53,9 +53,13 @@ describe Backend::Beanstalk  do
   end
 
   it "should consume from multiple queues" do
-    @q.queue_names = ['a', 'b']
-    @q.queue('a').put Adder.new(1)
-    @q.queue('b').put Adder.new(2)
+    @q.queues = ["a", "b"]
+    job1 = Adder.new(1)
+    job1.queue = "a"
+    @q.put(job1)
+    job2 = Adder.new(2)
+    job2.queue = "b"
+    @q.put(job2)
     @q.reserve.perform.should eql(1)
     @q.reserve.perform.should eql(2)
   end

@@ -1,6 +1,6 @@
 module Quebert
   module Serializer
-    
+
     # Does this mean you could queue a job that could queue a job? Whoa!
     class Job
       def self.serialize(job)
@@ -9,21 +9,23 @@ module Quebert
           'args' => serialize_args(job.args),
           'priority' => job.priority,
           'delay' => job.delay,
-          'ttr' => job.ttr
+          'ttr' => job.ttr,
+          'queue' => job.queue
         }
       end
-      
+
       def self.deserialize(hash)
         hash = Support.stringify_keys(hash)
         job = Support.constantize(hash['job']).new(*deserialize_args(hash['args']))
         job.priority = hash['priority']
         job.delay = hash['delay']
         job.ttr = hash['ttr']
+        job.queue = hash['queue']
         job
       end
-      
+
     private
-    
+
       # Reflect on each arg and see if it has a seralizer
       def self.serialize_args(args)
         args.map do |arg|
@@ -37,7 +39,7 @@ module Quebert
           hash
         end
       end
-      
+
       # Find a serializer and/or push out a value
       def self.deserialize_args(args)
         args.map do |arg|
@@ -50,7 +52,7 @@ module Quebert
         end
       end
     end
-    
+
     # Deal with converting an AR to/from a hash that we can send over the wire.
     class ActiveRecord
       def self.serialize(record)
@@ -60,7 +62,7 @@ module Quebert
         end
         { 'model' => record.class.model_name.to_s, 'attributes' => attrs }
       end
-      
+
       def self.deserialize(hash)
         hash = Support.stringify_keys(hash)
         model = Support.constantize(hash.delete('model'))
@@ -81,6 +83,5 @@ module Quebert
         end
       end
     end
-    
   end
 end

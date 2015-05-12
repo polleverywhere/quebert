@@ -17,7 +17,7 @@ end
 describe Controller::Beanstalk do
   before(:all) do
     @q = Backend::Beanstalk.configure(:host => "localhost:11300",
-      :default_queue => "quebert-test-jobs-actions")
+      :queue => "quebert-test-jobs-actions")
   end
 
   before(:each) do
@@ -39,12 +39,11 @@ describe Controller::Beanstalk do
   end
 
   it "should bury an AR job if an exception occurs deserializing it" do
-    @user = User.new(:first_name => "John", :last_name => "Doe", :email => "jdoe@gmail.com")
-    @user.id = 1
-    @q.put Serializer::ActiveRecord.serialize(@user)
-    @q.peek(:ready).should_not be_nil
+    tube = @q.send(:default_tube)
+    tube.put({:foo => "bar"}.to_json)
+    tube.peek(:ready).should_not be_nil
     lambda{ @q.reserve.perform }.should raise_exception
-    @q.peek(:buried).should_not be_nil
+    tube.peek(:buried).should_not be_nil
   end
 
   context "job actions" do
