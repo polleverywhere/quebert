@@ -23,7 +23,6 @@ module Quebert
 
     # Exceptions are used for signaling job status... ewww. Yank this out and
     # replace with a more well thought out controller.
-    NotImplemented = Class.new(StandardError)
     Action  = Class.new(Exception)
     Bury    = Class.new(Action)
     Delete  = Class.new(Action)
@@ -41,7 +40,7 @@ module Quebert
     end
 
     def perform(*args)
-      raise NotImplemented
+      raise NotImplementedError
     end
 
     # Runs the perform method that somebody else should be implementing

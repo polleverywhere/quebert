@@ -21,7 +21,7 @@ describe Quebert::Job do
   it "should raise not implemented on base job" do
     lambda {
       Job.new.perform
-    }.should raise_exception(Quebert::Job::NotImplemented)
+    }.should raise_exception(NotImplementedError)
   end
 
   it "should convert job to and from JSON" do
