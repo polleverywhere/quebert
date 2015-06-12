@@ -42,7 +42,7 @@ module Quebert
         beanstalk_job.release :pri => job.priority, :delay => job.delay
         logger.info(job) { "Job released" }
       rescue Job::Bury
-        logger.info(job) { "Burrying job" }
+        logger.info(job) { "Burying job" }
         beanstalk_job.bury
         logger.info(job) { "Job buried" }
       rescue Job::Timeout => e
@@ -66,7 +66,7 @@ module Quebert
         delay = TIMEOUT_RETRY_DELAY_SEED + TIMEOUT_RETRY_GROWTH_RATE**beanstalk_job.stats["releases"].to_i
 
         if delay > MAX_TIMEOUT_RETRY_DELAY
-          logger.error(job) { "Max retry delay exceeded. Burrying job" }
+          logger.error(job) { "Max retry delay exceeded. Burying job" }
           beanstalk_job.bury
           logger.error(job) { "Job buried" }
         else
