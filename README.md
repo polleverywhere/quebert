@@ -2,15 +2,19 @@
 
 [![Build Status](https://travis-ci.org/polleverywhere/quebert.png?branch=master)](https://travis-ci.org/polleverywhere/quebert) [![Code Climate](https://codeclimate.com/repos/555266fc6956805b9e0033b5/badges/008e51483e8e268f21db/gpa.svg)](https://codeclimate.com/repos/555266fc6956805b9e0033b5/feed)
 
-async_observer is great, but is dated and doesn't really support running jobs outside of the async_send idiom. Quebert is an attempt to mix how jobs are run in other popular worker queue frameworks, like resque and dj, with async_observer so that you can have it both ways.
+Quebert is a ruby background worker library that works with the very fast and simple [beanstalkd](http://kr.github.io/beanstalkd/) deamon.
 
-# Why Quebert (or how is it different from DJ and Resque)?
+# Why Quebert?
 
-Because it has really low latency. Other Ruby queuing frameworks, like DJ or Resque, have to poll their queue servers periodicly. You could think of it as a "pull" queue. Quebert is a "push" queue. It maintains a persistent connection with beanstalkd and when is enqueud, its instantly pushed to the workers and executed.
+Because it has really low latency. Other Ruby queuing frameworks, like [DJ](https://github.com/collectiveidea/delayed_job) or [Resque](https://github.com/resque/resque), have to poll their queue servers periodicly. You could think of it as a "pull" queue. Quebert is a "push" queue. It maintains a persistent connection with beanstalkd and when is enqueud, its instantly pushed to the workers and executed.
+
+[Sidekiq](http://sidekiq.org) uses Redis's "push" primitives so it has low latency, but it doesn't support class reloading in a development environment. Sidekiq is also threaded, which means there are no garauntees of reliability when running non-threadsafe code.
+
+[Backburner](https://github.com/nesquena/backburner) is very similar to Quebert. It offers more options for concurrency (threading, forking, etc.) than queubert but lacks pluggable back-ends, which means you'll be stubbing and mocking async calls.
 
 # Who uses it?
 
-Quebert is a serious project. Its used in a production environment at Poll Everywhere to handle everything from SMS message processing to account downgrades.
+Quebert is a serious project. Its used in a production environment at [Poll Everywhere](https://www.polleverywhere.com/) to handle everything from SMS message processing to account downgrades.
 
 # Features
 
@@ -52,7 +56,10 @@ Quebert.backend.put WackyMathWizard.new(1, 2, 3)
 Or drop it in right from the job:
 
 ```ruby
+# Run job right away!
 WackyMathWizard.new(4, 5, 6).enqueue
+# Run a lower priority job in 10 seconds for a max of 120 seconds
+WackyMathWizard.new(10, 10, 10).enqueue(ttr: 120, priority: 100, delay: 10)
 ```
 
 Then perform the jobs!
@@ -60,6 +67,7 @@ Then perform the jobs!
 ```ruby
 Quebert.backend.reserve.perform # => 6
 Quebert.backend.reserve.perform # => 15
+Quebert.backend.reserve.perform # => 30
 ```
 
 ## Rails integration
@@ -190,12 +198,23 @@ class FooJob < Quebert::Job
 end
 ```
 
-## Beanstalk: Changing a job's TTR
+## Overriding other job defaults
+
+A `Quebert::Job` is a Plain Ol' Ruby Object. The defaults of a job, including its `ttr`, `queue_name`, and `delay` may be overridden in a super class as follows:
 
 ```ruby
+# Assuming you're in Rails or using ActiveSupport
 class FooJob < Quebert::Job
   def ttr
     5.minutes
+  end
+
+  def delay
+    30.seconds
+  end
+
+  def queue_name
+    "long-running-delayed-jobs"
   end
 
   def perform(args)
@@ -203,3 +222,5 @@ class FooJob < Quebert::Job
   end
 end
 ```
+
+Take a look at the [`Quebert::Job` class](https://github.com/polleverywhere/quebert/blob/master/lib/quebert/job.rb) code for more details on methods you may ovveride.
