@@ -91,7 +91,7 @@ Quebert.config.from_hash(Rails.application.config.quebert)
 Quebert.config.logger = Rails.logger
 ```
 
-### Job & Worker Hooks
+### Job & Worker hooks
 
 Quebert has support for providing custom hooks to be called before, after & around your jobs are being run.
 A common example is making sure that any active ActiveRecord database connections are put back on the connection pool after a job is done:
@@ -112,7 +112,7 @@ Quebert.config.around_job do |job|
 end
 ```
 
-### Async Sender
+### Async sender
 
 Take any ol' class and include the Quebert::AsyncSender.
 
