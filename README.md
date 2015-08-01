@@ -4,7 +4,7 @@
 
 Quebert is a ruby background worker library that works with the very fast and simple [beanstalkd](http://kr.github.io/beanstalkd/) deamon.
 
-# Why Quebert?
+## Why Quebert?
 
 Because it has really low latency. Other Ruby queuing frameworks, like [DJ](https://github.com/collectiveidea/delayed_job) or [Resque](https://github.com/resque/resque), have to poll their queue servers periodicly. You could think of it as a "pull" queue. Quebert is a "push" queue. It maintains a persistent connection with beanstalkd and when is enqueud, its instantly pushed to the workers and executed.
 
@@ -12,28 +12,28 @@ Because it has really low latency. Other Ruby queuing frameworks, like [DJ](http
 
 [Backburner](https://github.com/nesquena/backburner) is very similar to Quebert. It offers more options for concurrency (threading, forking, etc.) than queubert but lacks pluggable back-ends, which means you'll be stubbing and mocking async calls.
 
-# Who uses it?
+## Who uses it?
 
 Quebert is a serious project. Its used in a production environment at [Poll Everywhere](https://www.polleverywhere.com/) to handle everything from SMS message processing to account downgrades.
 
-# Features
+## Features
 
-* Multiple back-ends (InProcess, Sync, and Beanstalk)
-* Rails/ActiveRecord integration similar to async_observer
-* Pluggable exception handling (for Hoptoad integration)
-* Run workers with pid, log, and config files. These do not daemonize (do it yourself punk!)
-* Provide custom hooks to be called before, after & around jobs are run
+* **Multiple back-ends** (InProcess, Sync, and Beanstalk)
+* **Rails/ActiveRecord integration** similar to async_observer
+* **Pluggable exception handling** (for Hoptoad integration)
+* **Run workers with pid, log, and config files**. These do not daemonize (do it yourself punk!)
+* **Custom hooks** that may be called before, after & around jobs are run
 
-Some features that are currently missing that I will soon add include:
+Some features that are currently *missing* that I will soon add include:
 
 * Rails plugin support (The AR integrations have to be done manually today)
 * Auto-detecting serializers. Enhanced ClassRegistry to more efficiently look up serializers for objects.
 
-# How to use
+## How to use
 
 There are two ways to enqueue jobs with Quebert: through the Job itself, provided you set a default back-end for the job, or put it on the backend.
 
-## Jobs
+### Jobs
 
 Quebert includes a Job class so you can implement how you want certain types of Jobs performed.
 
@@ -70,7 +70,7 @@ Quebert.backend.reserve.perform # => 15
 Quebert.backend.reserve.perform # => 30
 ```
 
-## Rails integration
+### Rails integration
 
 config/quebert.yml:
 
@@ -91,7 +91,7 @@ Quebert.config.from_hash(Rails.application.config.quebert)
 Quebert.config.logger = Rails.logger
 ```
 
-## Before/After/Around Hooks
+### Job & Worker Hooks
 
 Quebert has support for providing custom hooks to be called before, after & around your jobs are being run.
 A common example is making sure that any active ActiveRecord database connections are put back on the connection pool after a job is done:
@@ -112,7 +112,7 @@ Quebert.config.around_job do |job|
 end
 ```
 
-## Async Sender
+### Async Sender
 
 Take any ol' class and include the Quebert::AsyncSender.
 
@@ -170,13 +170,13 @@ Quebert.backend.reserve.perform # => "waazup Coraline!"
 
 * Only basic data types are included for serialization. Serializers may be customized to include support for different types.
 
-## Backends
+### Backends
 
 * Beanstalk: Enqueue jobs in a beanstalkd service. The workers run in a separate process. Typically used in production environments.
 * Sync: Perform jobs immediately upon enqueuing. Typically used in testing environments.
 * InProcess: Enqueue jobs in an in-memory array. A worker will need to reserve a job to perform.
 
-## Using multiple queues
+### Multiple queues
 
 To start a worker pointed at a non-default queue (e.g., a Quebert "tube"), start the process with `-q`:
 
@@ -198,7 +198,7 @@ class FooJob < Quebert::Job
 end
 ```
 
-## Overriding other job defaults
+### Setting job defaults
 
 A `Quebert::Job` is a Plain Ol' Ruby Object. The defaults of a job, including its `ttr`, `queue_name`, and `delay` may be overridden in a super class as follows:
 
