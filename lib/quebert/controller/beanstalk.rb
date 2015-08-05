@@ -31,7 +31,7 @@ module Quebert
           beanstalk_job.delete
         end
 
-        logger.error(job) { "Completed in #{(time*1000*1000).to_i/1000.to_f} ms\n" }
+        logger.info(job) { "Completed in #{(time*1000*1000).to_i/1000.to_f} ms\n" }
         result
       rescue Job::Delete
         logger.info(job) { "Deleting job" }
