@@ -22,8 +22,8 @@ module Quebert
       end
 
       def perform
-        logger.error(job) { "Performing with args #{job.args.inspect}" }
-        logger.error(job) { "Beanstalk Job Stats: #{beanstalk_job.stats.inspect}" }
+        logger.info(job) { "Performing with args #{job.args.inspect}" }
+        logger.info(job) { "Beanstalk Job Stats: #{beanstalk_job.stats.inspect}" }
 
         result = false
         time = Benchmark.realtime do
