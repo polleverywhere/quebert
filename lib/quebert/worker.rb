@@ -22,16 +22,7 @@ module Quebert
         begin
           @controller.perform
         rescue => error
-          if exception_handler
-            exception_handler.call(
-              error,
-              :controller => @controller,
-              :pid => $$,
-              :worker => self
-            )
-          else
-            raise
-          end
+          @controller.job.handle_error(error, self)
         end
         @controller = nil
 
@@ -55,13 +46,13 @@ module Quebert
       exit 0
     end
 
+    def exception_handler
+      @exception_handler ||= Quebert.config.worker.exception_handler
+    end
+
   protected
     def backend
       @backend ||= Quebert.config.backend
-    end
-
-    def exception_handler
-      @exception_handler ||= Quebert.config.worker.exception_handler
     end
   end
 end

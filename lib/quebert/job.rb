@@ -64,6 +64,28 @@ module Quebert
       Quebert.config.after_job(self)
     end
 
+    # Can be overridden by the job implementation for
+    # custom exception handling hooks.
+    def handle_error(error, worker)
+      # TODO - Change the behavior of this method to
+      # log the error and bury the job. Get rid of everything
+      # else.
+      logger.error [error.inspect, worker.inspect].join
+
+      # TODO - Kill this stupid hook
+      if handler = worker.exception_handler
+        handler.call(
+          error,
+          :controller => @controller,
+          :pid => $$,
+          :worker => worker
+        )
+      else
+        raise
+      end
+
+    end
+
     # Accepts arguments that override the job options and enqueu this stuff.
     def enqueue(override_opts={})
       override_opts.each { |opt, val| self.send("#{opt}=", val) }
