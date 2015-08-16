@@ -4,17 +4,26 @@ module Quebert
     # a job can do to be rescheduled, etc.
     class Base
       attr_reader :job
-      
+
       def initialize(job)
         @job = job
       end
-      
+
       def perform
         begin
-          job.perform!
+          job.perform!(self)
         rescue Job::Action
           # Nothing to do chief!
         end
+      end
+
+      def bury!
+      end
+
+      def release!
+      end
+
+      def delete!
       end
     end
   end

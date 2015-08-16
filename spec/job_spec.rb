@@ -53,21 +53,21 @@ describe Quebert::Job do
 
   context "actions" do
     it "should raise release" do
-      lambda{
-        ReleaseJob.new.perform
-      }.should raise_exception(Job::Release)
+      job = ReleaseJob.new
+      job.should_receive(:release!)
+      job.perform!
     end
 
     it "should raise delete" do
-      lambda{
-        DeleteJob.new.perform
-      }.should raise_exception(Job::Delete)
+      job = DeleteJob.new
+      job.should_receive(:delete!)
+      job.perform!
     end
 
     it "should raise bury" do
-      lambda{
-        BuryJob.new.perform
-      }.should raise_exception(Job::Bury)
+      job = BuryJob.new
+      job.should_receive(:bury!)
+      job.perform!
     end
   end
 

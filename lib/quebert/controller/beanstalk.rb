@@ -27,24 +27,11 @@ module Quebert
 
         result = false
         time = Benchmark.realtime do
-          result = job.perform!
-          beanstalk_job.delete
+          result = job.perform!(self)
         end
 
         logger.info(job) { "Completed in #{(time*1000*1000).to_i/1000.to_f} ms\n" }
         result
-      rescue Job::Delete
-        logger.info(job) { "Deleting job" }
-        beanstalk_job.delete
-        logger.info(job) { "Job deleted" }
-      rescue Job::Release
-        logger.info(job) { "Releasing with priority: #{job.priority} and delay: #{job.delay}" }
-        beanstalk_job.release :pri => job.priority, :delay => job.delay
-        logger.info(job) { "Job released" }
-      rescue Job::Bury
-        logger.info(job) { "Burying job" }
-        beanstalk_job.bury
-        logger.info(job) { "Job buried" }
       rescue Job::Timeout => e
         logger.info(job) { "Job timed out. Retrying with delay. #{e.inspect} #{e.backtrace.join("\n")}" }
         retry_with_delay
@@ -59,6 +46,24 @@ module Quebert
         beanstalk_job.bury
         logger.error(job) { "Job buried" }
         raise
+      end
+
+      def bury!
+        logger.info(job) { "Burying job" }
+        beanstalk_job.bury
+        logger.info(job) { "Job buried" }
+      end
+
+      def release!
+        logger.info(job) { "Releasing with priority: #{job.priority} and delay: #{job.delay}" }
+        beanstalk_job.release :pri => job.priority, :delay => job.delay
+        logger.info(job) { "Job released" }
+      end
+
+      def delete!
+        logger.info(job) { "Deleting job" }
+        beanstalk_job.delete
+        logger.info(job) { "Job deleted" }
       end
 
     protected

@@ -4,9 +4,10 @@ require 'timeout'
 module Quebert
   class Job
     include Logging
+    extend Forwardable
 
     attr_reader :args
-    attr_accessor :priority, :delay, :ttr, :queue
+    attr_accessor :priority, :delay, :ttr, :queue, :controller
 
     # Prioritize Quebert jobs as specified in https://github.com/kr/beanstalkd/blob/master/doc/protocol.txt.
     class Priority
@@ -44,7 +45,8 @@ module Quebert
     end
 
     # Runs the perform method that somebody else should be implementing
-    def perform!
+    def perform!(controller = default_controller)
+      @controller = controller
       before_perform
       # Honor the timeout and kill the job in ruby-space. Beanstalk
       # should be cleaning up this job and returning it to the queue
@@ -52,6 +54,10 @@ module Quebert
       val = ::Timeout.timeout(ttr, Job::Timeout){ perform(*args) }
       after_perform
       val
+    end
+
+    def default_controller
+      Quebert::Controller::Base.new(self)
     end
 
     def before_perform
@@ -76,7 +82,7 @@ module Quebert
       if handler = worker.exception_handler
         handler.call(
           error,
-          :controller => @controller,
+          :controller => controller,
           :pid => $$,
           :worker => worker
         )
@@ -117,16 +123,6 @@ module Quebert
     end
 
   protected
-    def delete!
-      raise Delete
-    end
-
-    def release!
-      raise Release
-    end
-
-    def bury!
-      raise Bury
-    end
+    def_delegators :@controller, :delete!, :release!, :bury!
   end
 end
