@@ -17,9 +17,8 @@ class BuryJob < Quebert::Job
 end
 
 class TimeoutJob < Quebert::Job
-  def initialize
-    super
-    @ttr = 1
+  def ttr
+    1
   end
 
   def perform

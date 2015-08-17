@@ -32,15 +32,6 @@ module Quebert
 
         logger.info(job) { "Completed in #{(time*1000*1000).to_i/1000.to_f} ms\n" }
         result
-      rescue Job::Timeout => e
-        logger.info(job) { "Job timed out. Retrying with delay. #{e.inspect} #{e.backtrace.join("\n")}" }
-        retry_with_delay
-        raise
-      rescue Job::Retry
-        # The difference between the Retry and Timeout class is that
-        # Retry does not logger.error(job) { an exception where as Timeout does }
-        logger.info(job) { "Manually retrying with delay" }
-        retry_with_delay
       rescue => e
         logger.error(job) { "Error caught on perform. Burying job. #{e.inspect} #{e.backtrace.join("\n")}" }
         beanstalk_job.bury
@@ -66,6 +57,16 @@ module Quebert
         logger.info(job) { "Job deleted" }
       end
 
+      def timeout!(e)
+        logger.info(job) { "Job timed out. Retrying with delay. #{e.inspect} #{e.backtrace.join("\n")}" }
+        retry_with_delay
+      end
+
+      def retry!
+        logger.info(job) { "Manually retrying with delay" }
+        retry_with_delay
+      end
+
     protected
       def retry_with_delay
         delay = TIMEOUT_RETRY_DELAY_SEED + TIMEOUT_RETRY_GROWTH_RATE**beanstalk_job.stats["releases"].to_i
@@ -79,8 +80,8 @@ module Quebert
           beanstalk_job.release :pri => job.priority, :delay => delay
           logger.error(job) { "Job released" }
         end
-      rescue ::Beaneater::NotFoundError
-        logger.error(job) { "Job ran longer than allowed. Beanstalk already deleted it!!!!" }
+      rescue Beaneater::NotFoundError
+        logger.error(job) { "Job ran longer than allowed. Beanstalk already deleted it!" }
         # Sometimes the timer doesn't behave correctly and this job actually runs longer than
         # allowed. At that point the beanstalk job no longer exists anymore. Lets let it go and don't blow up.
       end

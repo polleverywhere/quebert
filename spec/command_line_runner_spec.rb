@@ -4,17 +4,19 @@ describe CommandLineRunner do
   before(:all) do
     Quebert.config.backend = Backend::InProcess.new
   end
-  
+
   context "log-file" do
     it "should write log file" do
+      logger = Quebert.config.logger
       clean_file 'log.log' do
         lambda{
           CommandLineRunner.dispatch(%w(worker --log log.log))
         }.should change { File.read('log.log') if File.exists?('log.log') }
       end
+      Quebert.config.logger = logger
     end
   end
-  
+
   context "pid-file" do
     it "should write pid" do
       clean_file 'pid.pid' do
@@ -23,14 +25,14 @@ describe CommandLineRunner do
         Support::PidFile.read('pid.pid').should eql(Process.pid)
       end
     end
-    
+
     it "should remove stale" do
       clean_file 'pid.pid', "-1" do
         CommandLineRunner.dispatch(%w(worker --pid pid.pid))
         Support::PidFile.read('pid.pid').should eql(Process.pid)
       end
     end
-    
+
     it "should complain if the pid is already running" do
       clean_file 'pid.pid', Process.pid do
         lambda{
@@ -40,7 +42,7 @@ describe CommandLineRunner do
       end
     end
   end
-  
+
   context "config-file" do
     it "should auto-detect rails environment file" do
       clean_file './config/environment.rb', "raise 'RailsConfig'" do
@@ -49,7 +51,7 @@ describe CommandLineRunner do
         }.should raise_exception('RailsConfig')
       end
     end
-    
+
     it "should run config file" do
       clean_file './super_awesome.rb', "raise 'SuperAwesome'" do
         lambda{
@@ -57,19 +59,19 @@ describe CommandLineRunner do
         }.should raise_exception('SuperAwesome')
       end
     end
-    
+
   end
-  
+
   context "chdir" do
     before(:each) do
       @chdir = Dir.pwd
     end
-    
+
     it "should change chdir" do
       CommandLineRunner.dispatch(%w(worker --chdir /))
       Dir.pwd.should eql('/')
     end
-    
+
     after(:each) do
       Dir.chdir(@chdir)
     end

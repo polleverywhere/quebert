@@ -22,14 +22,8 @@ module Quebert
     # By default, the job should live for 10 seconds tops.
     DEFAULT_JOB_TTR = 10
 
-    # Exceptions are used for signaling job status... ewww. Yank this out and
-    # replace with a more well thought out controller.
-    Action  = Class.new(Exception)
-    Bury    = Class.new(Action)
-    Delete  = Class.new(Action)
-    Release = Class.new(Action)
-    Timeout = Class.new(Action)
-    Retry   = Class.new(Action)
+    # Catch timeouts thrown by Quebert jobs.
+    Timeout = Class.new(::Timeout::Error)
 
     def initialize(*args)
       @priority = Job::Priority::MEDIUM
@@ -54,6 +48,8 @@ module Quebert
       val = ::Timeout.timeout(ttr, Job::Timeout){ perform(*args) }
       after_perform
       val
+    rescue Job::Timeout => e
+      timeout! e
     end
 
     def default_controller
@@ -123,6 +119,6 @@ module Quebert
     end
 
   protected
-    def_delegators :@controller, :delete!, :release!, :bury!
+    def_delegators :@controller, :delete!, :release!, :bury!, :timeout!
   end
 end

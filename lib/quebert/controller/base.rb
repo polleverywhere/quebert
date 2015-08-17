@@ -25,6 +25,12 @@ module Quebert
 
       def delete!
       end
-    end
+
+      def timeout!(e)
+      end
+
+      def retry!
+      end
+   end
   end
 end
