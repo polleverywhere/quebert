@@ -19,6 +19,8 @@ module Quebert
         base.instance_eval do
           def method_added(name)
             return if name != :initialize
+            return if @__initialize_overwritten__
+            @__initialize_overwritten__ = true
             overwrite_initialize
           end
         end
