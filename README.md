@@ -33,6 +33,11 @@ Some features that are currently *missing* that I will soon add include:
 
 There are two ways to enqueue jobs with Quebert: through the Job itself, provided you set a default back-end for the job, or put it on the backend.
 
+### Supported Ruby Versions
+
+Quebert officially is supported to run on the currently supported versions of MRI.
+This includes versions >= `2.2.5`. Have a look at the `.travis.yml` configuration file to see all Ruby versions we support.
+
 ### Jobs
 
 Quebert includes a Job class so you can implement how you want certain types of Jobs performed.
