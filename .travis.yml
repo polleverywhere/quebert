@@ -1,6 +1,6 @@
 language: ruby
 rvm:
-  - 2.1.6
+  - 2.2.5
 before_install:
   - curl -L https://github.com/kr/beanstalkd/archive/v1.9.tar.gz | tar xz -C /tmp
   - cd /tmp/beanstalkd-1.9/
