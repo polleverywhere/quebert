@@ -96,7 +96,7 @@ Quebert.config.from_hash(Rails.application.config.quebert)
 Quebert.config.logger = Rails.logger
 ```
 
-### Job & Worker hooks
+### Global Job hooks
 
 Quebert has support for providing custom hooks to be called before, after & around your jobs are being run.
 A common example is making sure that any active ActiveRecord database connections are put back on the connection pool after a job is done:
@@ -116,6 +116,22 @@ Quebert.config.around_job do |job|
   # once before & once after a job is performed
 end
 ```
+
+### Beanstalk Job hooks
+
+Jobs can define their own business logic that will get called surrounding Beanstalk events:
+
+```ruby
+class FooJob < Quebert::Job
+  def around_bury
+    # custom pre-bury code
+    yield
+    # custom post-bury code
+  end
+end
+```
+
+Supported Beanstalk event hooks: `around_bury`, `around_release`, `around_delete`
 
 ### Async sender
 

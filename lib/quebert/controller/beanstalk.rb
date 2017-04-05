@@ -28,22 +28,22 @@ module Quebert
         result = false
         time = Benchmark.realtime do
           result = job.perform!
-          beanstalk_job.delete
+          delete
         end
 
         logger.info(job) { "Completed in #{(time*1000*1000).to_i/1000.to_f} ms\n" }
         result
       rescue Job::Delete
         logger.info(job) { "Deleting job" }
-        beanstalk_job.delete
+        delete
         logger.info(job) { "Job deleted" }
       rescue Job::Release
         logger.info(job) { "Releasing with priority: #{job.priority} and delay: #{job.delay}" }
-        beanstalk_job.release :pri => job.priority, :delay => job.delay
+        release(pri: job.priority, delay: job.delay)
         logger.info(job) { "Job released" }
       rescue Job::Bury
         logger.info(job) { "Burying job" }
-        beanstalk_job.bury
+        bury
         logger.info(job) { "Job buried" }
       rescue Job::Timeout => e
         logger.info(job) { "Job timed out. Retrying with delay. #{e.inspect} #{e.backtrace.join("\n")}" }
@@ -56,7 +56,7 @@ module Quebert
         retry_with_delay
       rescue => e
         logger.error(job) { "Error caught on perform. Burying job. #{e.inspect} #{e.backtrace.join("\n")}" }
-        beanstalk_job.bury
+        bury
         logger.error(job) { "Job buried" }
         raise
       end
@@ -67,17 +67,35 @@ module Quebert
 
         if delay > MAX_TIMEOUT_RETRY_DELAY
           logger.error(job) { "Max retry delay exceeded. Burying job" }
-          beanstalk_job.bury
+          bury
           logger.error(job) { "Job buried" }
         else
           logger.error(job) { "TTR exceeded. Releasing with priority: #{job.priority} and delay: #{delay}" }
-          beanstalk_job.release :pri => job.priority, :delay => delay
+          release(pri: job.priority, delay: delay)
           logger.error(job) { "Job released" }
         end
       rescue ::Beaneater::NotFoundError
         logger.error(job) { "Job ran longer than allowed. Beanstalk already deleted it!!!!" }
         # Sometimes the timer doesn't behave correctly and this job actually runs longer than
         # allowed. At that point the beanstalk job no longer exists anymore. Lets let it go and don't blow up.
+      end
+
+      def bury
+        job.around_bury do
+          beanstalk_job.bury
+        end
+      end
+
+      def release(opts)
+        job.around_release do
+          beanstalk_job.release(opts)
+        end
+      end
+
+      def delete
+        job.around_delete do
+          beanstalk_job.delete
+        end
       end
     end
   end

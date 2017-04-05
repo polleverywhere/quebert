@@ -89,6 +89,21 @@ module Quebert
       @backend || Quebert.configuration.backend
     end
 
+    # Event hook that can be overridden
+    def around_bury
+      yield
+    end
+
+    # Event hook that can be overridden
+    def around_release
+      yield
+    end
+
+    # Event hook that can be overridden
+    def around_delete
+      yield
+    end
+
   protected
     def delete!
       raise Delete

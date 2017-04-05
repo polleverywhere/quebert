@@ -148,6 +148,65 @@ describe Quebert::Job do
           expect(job.beanstalk_job.ttr).to eql(300 + Quebert::Backend::Beanstalk::TTR_BUFFER)
         end
       end
+
+      describe "Beanstalk event hooks" do
+        it "calls the bury event hook" do
+          class BuryJob
+            attr_accessor :before_bury_ran, :after_bury_ran
+            def around_bury
+              self.before_bury_ran = true
+              yield
+              self.after_bury_ran = true
+            end
+          end
+          BuryJob.backend = @q
+          job = BuryJob.new.tap(&:enqueue)
+          controller = @q.reserve
+          expect(controller.job.before_bury_ran).to be_falsey
+          expect(controller.job.after_bury_ran).to be_falsey
+          controller.perform
+          expect(controller.job.before_bury_ran).to be_truthy
+          expect(controller.job.after_bury_ran).to be_truthy
+        end
+
+        it "calls the delete event hook" do
+          class DeleteJob
+            attr_accessor :before_delete_ran, :after_delete_ran
+            def around_delete
+              self.before_delete_ran = true
+              yield
+              self.after_delete_ran = true
+            end
+          end
+          DeleteJob.backend = @q
+          job = DeleteJob.new.tap(&:enqueue)
+          controller = @q.reserve
+          expect(controller.job.before_delete_ran).to be_falsey
+          expect(controller.job.after_delete_ran).to be_falsey
+          controller.perform
+          expect(controller.job.before_delete_ran).to be_truthy
+          expect(controller.job.after_delete_ran).to be_truthy
+        end
+
+        it "calls the release event hook" do
+          class ReleaseJob
+            attr_accessor :before_release_ran, :after_release_ran
+            def around_release
+              self.before_release_ran = true
+              yield
+              self.after_release_ran = true
+            end
+          end
+          ReleaseJob.backend = @q
+          job = ReleaseJob.new.tap(&:enqueue)
+          controller = @q.reserve
+          expect(controller.job.before_release_ran).to be_falsey
+          expect(controller.job.after_release_ran).to be_falsey
+          controller.perform
+          expect(controller.job.before_release_ran).to be_truthy
+          expect(controller.job.after_release_ran).to be_truthy
+        end
+      end
     end
   end
 
