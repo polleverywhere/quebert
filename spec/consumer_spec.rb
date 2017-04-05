@@ -7,9 +7,9 @@ describe Controller::Base do
 
   it "should rescue all raised job actions" do
     [ReleaseJob, DeleteJob, BuryJob].each do |job|
-      lambda{
+      expect {
         Controller::Base.new(job.new).perform
-      }.should_not raise_exception
+      }.to_not raise_exception
     end
   end
 end
@@ -34,7 +34,7 @@ describe Controller::Beanstalk do
   it "should bury job if an exception occurs in job" do
     @q.put Exceptional.new
     @q.peek(:ready).should_not be_nil
-    lambda{ @q.reserve.perform }.should raise_exception
+    expect { @q.reserve.perform }.to raise_exception
     @q.peek(:buried).should_not be_nil
   end
 
@@ -42,7 +42,7 @@ describe Controller::Beanstalk do
     tube = @q.send(:default_tube)
     tube.put({:foo => "bar"}.to_json)
     tube.peek(:ready).should_not be_nil
-    lambda{ @q.reserve.perform }.should raise_exception
+    expect { @q.reserve.perform }.to raise_exception
     tube.peek(:buried).should_not be_nil
   end
 
@@ -78,7 +78,9 @@ describe Controller::Beanstalk do
     job = @q.reserve
     job.beanstalk_job.stats["releases"].should eql(0)
     job.beanstalk_job.stats["delay"].should eql(0)
-    lambda{job.perform}.should raise_exception(Quebert::Job::Timeout)
+    expect {
+      job.perform
+    }.to raise_exception(Quebert::Job::Timeout)
 
     @q.peek(:ready).should be_nil
     beanstalk_job = @q.peek(:delayed)
@@ -90,7 +92,9 @@ describe Controller::Beanstalk do
 
     # lets set the max retry delay so it should bury instead of delay
     redefine_constant Quebert::Controller::Beanstalk, :MAX_TIMEOUT_RETRY_DELAY, 1
-    lambda{@q.reserve.perform}.should raise_exception(Quebert::Job::Timeout)
+    expect {
+      @q.reserve.perform
+    }.to raise_exception(Quebert::Job::Timeout)
 
     @q.peek(:ready).should be_nil
     @q.peek(:delayed).should be_nil

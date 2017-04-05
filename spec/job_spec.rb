@@ -82,17 +82,17 @@ describe Quebert::Job do
       let(:job){ Adder.new(1,2,3) }
 
       it "should enqueue with pri" do
-        job.should_receive(:pri=).with(100)
+        expect(job).to receive(:pri=).with(100)
         job.enqueue(:pri => 100)
       end
 
       it "should enqueue with ttr" do
-        job.should_receive(:ttr=).with(90)
+        expect(job).to receive(:ttr=).with(90)
         job.enqueue(:ttr => 90)
       end
 
       it "should enqueue with delay" do
-        job.should_receive(:delay=).with(80)
+        expect(job).to receive(:delay=).with(80)
         job.enqueue(:delay => 80)
       end
     end

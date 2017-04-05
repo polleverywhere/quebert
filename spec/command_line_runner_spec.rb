@@ -18,9 +18,9 @@ describe CommandLineRunner do
   context "pid-file" do
     it "should write pid" do
       clean_file 'pid.pid' do
-        File.exists?('pid').should be_false
+        expect(File.exists?('pid')).to be_falsey
         CommandLineRunner.dispatch(%w(worker --pid pid.pid))
-        Support::PidFile.read('pid.pid').should eql(Process.pid)
+        expect(Support::PidFile.read('pid.pid')).to eql(Process.pid)
       end
     end
     

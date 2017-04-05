@@ -36,34 +36,34 @@ describe AsyncSender::Class do
   describe "#async_send" do
     it "should async send class methods" do
       Greeter.async_send(:hi, 'Jeannette')
-      @q.reserve.perform.should eql(Greeter.send(:hi, 'Jeannette'))
+      expect(@q.reserve.perform).to eql(Greeter.send(:hi, 'Jeannette'))
     end
     
     it "should async send instance methods" do
       Greeter.new("brad").async_send(:hi, 'stunning')
-      @q.reserve.perform.should eql(Greeter.new("brad").hi('stunning'))
+      expect(@q.reserve.perform).to eql(Greeter.new("brad").hi('stunning'))
     end
   end
 
   describe "#async() promise" do
     it "should async send class methods" do
       Greeter.async.hi('Jeannette')
-      @q.reserve.perform.should eql(Greeter.send(:hi, 'Jeannette'))
+      expect(@q.reserve.perform).to eql(Greeter.send(:hi, 'Jeannette'))
     end
     
     it "should async send instance methods" do
       Greeter.new("brad").async.hi('stunning')
-      @q.reserve.perform.should eql(Greeter.new("brad").hi('stunning'))
+      expect(@q.reserve.perform).to eql(Greeter.new("brad").hi('stunning'))
     end
 
     it "should async send private instance methods" do
       Greeter.new("brad").async.send(:bye, 'stunning')
-      @q.reserve.perform.should eql(Greeter.new("brad").send(:bye, 'stunning'))
+      expect(@q.reserve.perform).to eql(Greeter.new("brad").send(:bye, 'stunning'))
     end
 
     it "should async send private class methods" do
       Greeter.async.send(:bye, 'Jeannette')
-      @q.reserve.perform.should eql(Greeter.send(:bye, 'Jeannette'))
+      expect(@q.reserve.perform).to eql(Greeter.send(:bye, 'Jeannette'))
     end
   end
 end
@@ -89,7 +89,7 @@ describe AsyncSender::ActiveRecord do
     
     it "should async_send instance method" do
       User.first.async_send(:name)
-      @q.reserve.perform.should eql(User.first.name)
+      expect(@q.reserve.perform).to eql(User.first.name)
     end
   end
   
@@ -101,20 +101,20 @@ describe AsyncSender::ActiveRecord do
         u.send(:write_attribute, :last_name, "Jones")
       end
       user.async.name
-      @q.reserve.perform.should eql("Barf Jones")
+      expect(@q.reserve.perform).to eql("Barf Jones")
     end
   end
   
   it "should async class method" do
     email = "brad@bradgessler.com"
     User.async.emailizer(email)
-    @q.reserve.perform.should eql(email)
+    expect(@q.reserve.perform).to eql(email)
   end
   
   it "should async_send and successfully serialize param object" do
     user = User.new(:first_name => 'Brad')
     user2 = User.new(:first_name => 'Steel')
     user.async.email!(user2)
-    @q.reserve.perform.first_name.should eql('Steel')
+    expect(@q.reserve.perform.first_name).to eql('Steel')
   end
 end
