@@ -4,72 +4,72 @@ describe CommandLineRunner do
   before(:all) do
     Quebert.config.backend = Backend::InProcess.new
   end
-  
+
   context "log-file" do
-    it "should write log file" do
+    it "writes log file" do
       clean_file 'log.log' do
-        lambda{
+        expect {
           CommandLineRunner.dispatch(%w(worker --log log.log))
-        }.should change { File.read('log.log') if File.exists?('log.log') }
+        }.to change { File.read('log.log') if File.exists?('log.log') }
       end
     end
   end
-  
+
   context "pid-file" do
-    it "should write pid" do
+    it "writes pid" do
       clean_file 'pid.pid' do
         expect(File.exists?('pid')).to be_falsey
         CommandLineRunner.dispatch(%w(worker --pid pid.pid))
         expect(Support::PidFile.read('pid.pid')).to eql(Process.pid)
       end
     end
-    
-    it "should remove stale" do
+
+    it "removes stale" do
       clean_file 'pid.pid', "-1" do
         CommandLineRunner.dispatch(%w(worker --pid pid.pid))
-        Support::PidFile.read('pid.pid').should eql(Process.pid)
+        expect(Support::PidFile.read('pid.pid')).to eql(Process.pid)
       end
     end
-    
-    it "should complain if the pid is already running" do
+
+    it "complains if the pid is already running" do
       clean_file 'pid.pid', Process.pid do
-        lambda{
+        expect {
           CommandLineRunner.dispatch(%w(worker --pid pid.pid))
-        }.should raise_exception(Support::PidFile::ProcessRunning)
-        Support::PidFile.read('pid.pid').should eql(Process.pid)
+        }.to raise_exception(Support::PidFile::ProcessRunning)
+        expect(Support::PidFile.read('pid.pid')).to eql(Process.pid)
       end
     end
   end
-  
+
   context "config-file" do
-    it "should auto-detect rails environment file" do
+    it "auto-detects rails environment file" do
       clean_file './config/environment.rb', "raise 'RailsConfig'" do
-        lambda{
+        expect {
           CommandLineRunner.dispatch(%w(worker))
-        }.should raise_exception('RailsConfig')
+        }.to raise_exception('RailsConfig')
       end
     end
-    
-    it "should run config file" do
+
+    it "runs config file" do
       clean_file './super_awesome.rb', "raise 'SuperAwesome'" do
-        lambda{
+        expect {
           CommandLineRunner.dispatch(%w(worker --config ./super_awesome.rb))
-        }.should raise_exception('SuperAwesome')
+        }.to raise_exception('SuperAwesome')
       end
     end
-    
+
   end
-  
+
   context "chdir" do
     before(:each) do
       @chdir = Dir.pwd
     end
-    
-    it "should change chdir" do
+
+    it "changes chdir" do
       CommandLineRunner.dispatch(%w(worker --chdir /))
-      Dir.pwd.should eql('/')
+      expect(Dir.pwd).to eql('/')
     end
-    
+
     after(:each) do
       Dir.chdir(@chdir)
     end

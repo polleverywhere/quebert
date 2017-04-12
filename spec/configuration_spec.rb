@@ -11,11 +11,11 @@ describe Configuration do
 
     it "should configure backend" do
       backend = @config.backend
-      backend.should be_instance_of(Quebert::Backend::Beanstalk)
+      expect(backend).to be_instance_of(Quebert::Backend::Beanstalk)
       # Blech, gross nastiness in their lib, but we need to look in to see if this stuff as configed
-      backend.send(:beanstalkd_connection).connection.host.should eql("localhost")
-      backend.send(:beanstalkd_connection).connection.port.should eql(11300)
-      backend.send(:default_tube).name.should eql("quebert-config-test")
+      expect(backend.send(:beanstalkd_connection).connection.host).to eql("localhost")
+      expect(backend.send(:beanstalkd_connection).connection.port).to eql(11300)
+      expect(backend.send(:default_tube).name).to eql("quebert-config-test")
     end
   end
 end

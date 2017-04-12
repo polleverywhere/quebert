@@ -7,21 +7,23 @@ describe Quebert::Job do
   end
 
   it "shoud initialize with block" do
-    Adder.new(1,2,3){|a| a.priority = 8080 }.priority.should == 8080
+    expect(
+      Adder.new(1,2,3){|a| a.priority = 8080 }.priority
+    ).to eql(8080)
   end
 
   it "should perform!" do
-    Adder.new(1,2,3).perform!.should eql(6)
+    expect(Adder.new(1,2,3).perform!).to eql(6)
   end
 
   it "should perform 0 arg jobs" do
-    Adder.new.perform!.should eql(0)
+    expect(Adder.new.perform!).to eql(0)
   end
 
   it "should raise not implemented on base job" do
-    lambda {
+    expect {
       Job.new.perform
-    }.should raise_exception(NotImplementedError)
+    }.to raise_exception(NotImplementedError)
   end
 
   it "should convert job to and from JSON" do
@@ -30,52 +32,52 @@ describe Quebert::Job do
     job.queue = "foo"
     serialized = job.to_json
     unserialized = Adder.from_json(serialized)
-    unserialized.should be_a(Adder)
-    unserialized.args.should eql(args)
-    unserialized.queue.should eql("foo")
+    expect(unserialized).to be_a(Adder)
+    expect(unserialized.args).to eql(args)
+    expect(unserialized.queue).to eql("foo")
   end
 
   it "should have default MEDIUM priority" do
-    Job.new.priority.should == Quebert::Job::Priority::MEDIUM
+    expect(Job.new.priority).to eql(Quebert::Job::Priority::MEDIUM)
   end
 
   describe "Quebert::Job::Priority" do
     it "should have LOW priority of 4294967296" do
-      Quebert::Job::Priority::LOW.should == 4294967296
+      expect(Quebert::Job::Priority::LOW).to eql(4294967296)
     end
     it "should have MEDIUM priority of 2147483648" do
-      Quebert::Job::Priority::MEDIUM.should == 2147483648
+      expect(Quebert::Job::Priority::MEDIUM).to eql(2147483648)
     end
     it "should have HIGH priority of 0" do
-      Quebert::Job::Priority::HIGH.should == 0
+      expect(Quebert::Job::Priority::HIGH).to eql(0)
     end
   end
 
   context "actions" do
     it "should raise release" do
-      lambda{
+      expect {
         ReleaseJob.new.perform
-      }.should raise_exception(Job::Release)
+      }.to raise_exception(Job::Release)
     end
 
     it "should raise delete" do
-      lambda{
+      expect {
         DeleteJob.new.perform
-      }.should raise_exception(Job::Delete)
+      }.to raise_exception(Job::Delete)
     end
 
     it "should raise bury" do
-      lambda{
+      expect {
         BuryJob.new.perform
-      }.should raise_exception(Job::Bury)
+      }.to raise_exception(Job::Bury)
     end
   end
 
   context "job queue" do
     it "should enqueue" do
-      lambda{
+      expect {
         Adder.new(1,2,3).enqueue
-      }.should change(@q, :size).by(1)
+      }.to change(@q, :size).by(1)
     end
 
     context "#enqueue options" do
@@ -114,17 +116,17 @@ describe Quebert::Job do
           user = User.new(:first_name => "Steel")
           user.async(:priority => 1, :delay => 2, :ttr => 300).email!("somebody", nil, nil)
           job = @q.reserve
-          job.beanstalk_job.pri.should eql(1)
-          job.beanstalk_job.delay.should eql(2)
-          job.beanstalk_job.ttr.should eql(300 + Quebert::Backend::Beanstalk::TTR_BUFFER)
+          expect(job.beanstalk_job.pri).to eql(1)
+          expect(job.beanstalk_job.delay).to eql(2)
+          expect(job.beanstalk_job.ttr).to eql(300 + Quebert::Backend::Beanstalk::TTR_BUFFER)
         end
 
         it "should enqueue and honor beanstalk options" do
           User.async(:priority => 1, :delay => 2, :ttr => 300).emailizer("somebody", nil, nil)
           job = @q.reserve
-          job.beanstalk_job.pri.should eql(1)
-          job.beanstalk_job.delay.should eql(2)
-          job.beanstalk_job.ttr.should eql(300 + Quebert::Backend::Beanstalk::TTR_BUFFER)
+          expect(job.beanstalk_job.pri).to eql(1)
+          expect(job.beanstalk_job.delay).to eql(2)
+          expect(job.beanstalk_job.ttr).to eql(300 + Quebert::Backend::Beanstalk::TTR_BUFFER)
         end
       end
 
@@ -133,17 +135,17 @@ describe Quebert::Job do
           user = User.new(:first_name => "Steel")
           user.async_send(:email!, "somebody", nil, nil, :beanstalk => {:priority => 1, :delay => 2, :ttr => 300})
           job = @q.reserve
-          job.beanstalk_job.pri.should eql(1)
-          job.beanstalk_job.delay.should eql(2)
-          job.beanstalk_job.ttr.should eql(300 + Quebert::Backend::Beanstalk::TTR_BUFFER)
+          expect(job.beanstalk_job.pri).to eql(1)
+          expect(job.beanstalk_job.delay).to eql(2)
+          expect(job.beanstalk_job.ttr).to eql(300 + Quebert::Backend::Beanstalk::TTR_BUFFER)
         end
 
         it "should enqueue and honor beanstalk options" do
           User.async_send(:emailizer, "somebody", nil, nil, :beanstalk => {:priority => 1, :delay => 2, :ttr => 300})
           job = @q.reserve
-          job.beanstalk_job.pri.should eql(1)
-          job.beanstalk_job.delay.should eql(2)
-          job.beanstalk_job.ttr.should eql(300 + Quebert::Backend::Beanstalk::TTR_BUFFER)
+          expect(job.beanstalk_job.pri).to eql(1)
+          expect(job.beanstalk_job.delay).to eql(2)
+          expect(job.beanstalk_job.ttr).to eql(300 + Quebert::Backend::Beanstalk::TTR_BUFFER)
         end
       end
     end
@@ -151,9 +153,9 @@ describe Quebert::Job do
 
   context "Timeout" do
     it "should respect TTR option" do
-      lambda {
+      expect {
         TimeoutJob.new.perform!
-      }.should raise_exception(Quebert::Job::Timeout)
+      }.to raise_exception(Quebert::Job::Timeout)
     end
   end
 
@@ -181,10 +183,10 @@ describe Quebert::Job do
 
       jobs.each(&:perform!)
 
-      before_jobs.should eql jobs
-      after_jobs.should  eql jobs
+      expect(before_jobs).to eql jobs
+      expect(after_jobs).to  eql jobs
       # around_job hooks are called twice per job (before & after its performed)
-      around_jobs.should eql jobs.zip(jobs).flatten
+      expect(around_jobs).to eql jobs.zip(jobs).flatten
     end
   end
 end

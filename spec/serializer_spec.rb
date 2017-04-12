@@ -6,31 +6,31 @@ describe Serializer::ActiveRecord do
 
     it "should serialize" do
       h = Serializer::ActiveRecord.serialize(user)
-      h['model'].should eql('User')
-      h['attributes']['first_name'].should eql('Tom')
-      h['attributes']['id'].should eql(user.id)
+      expect(h['model']).to eql('User')
+      expect(h['attributes']['first_name']).to eql('Tom')
+      expect(h['attributes']['id']).to eql(user.id)
     end
-    
+
     it "should deserialize" do
       u = Serializer::ActiveRecord.deserialize(Serializer::ActiveRecord.serialize(user))
-      u.first_name.should eql('Tom')
-      u.id.should eql(user.id)
+      expect(u.first_name).to eql('Tom')
+      expect(u.id).to eql(user.id)
     end
   end
-  
+
   context "unpersisted" do
     let(:user) { User.new(:first_name => 'brad') }
 
     it "should serialize" do
       h = Serializer::ActiveRecord.serialize(user)
-      h['model'].should eql('User')
-      h['attributes']['first_name'].should eql('brad')
-      h['attributes']['id'].should be_nil
+      expect(h['model']).to eql('User')
+      expect(h['attributes']['first_name']).to eql('brad')
+      expect(h['attributes']['id']).to be_nil
     end
-    
+
     it "should deserialize" do
       u = Serializer::ActiveRecord.deserialize(Serializer::ActiveRecord.serialize(user))
-      u.first_name.should eql('brad')
+      expect(u.first_name).to eql('brad')
     end
   end
 end
@@ -50,44 +50,44 @@ describe Serializer::Job do
 
   describe "#serialize" do
     it "shold have job" do
-      serialized['job'].should eql('Quebert::Job')
+      expect(serialized['job']).to eql('Quebert::Job')
     end
 
     it "should have args" do
-      serialized['args'][0]['payload'].should eql(100)
-      serialized['args'][1]['payload'].should eql(Serializer::ActiveRecord.serialize(args[1]))
-      serialized['args'][1]['serializer'].should eql('Quebert::Serializer::ActiveRecord')
+      expect(serialized['args'][0]['payload']).to eql(100)
+      expect(serialized['args'][1]['payload']).to eql(Serializer::ActiveRecord.serialize(args[1]))
+      expect(serialized['args'][1]['serializer']).to eql('Quebert::Serializer::ActiveRecord')
     end
 
     it "should have priority" do
-      serialized['priority'].should eql(1)
+      expect(serialized['priority']).to eql(1)
     end
 
     it "should have delay" do
-      serialized['delay'].should eql(2)
+      expect(serialized['delay']).to eql(2)
     end
 
     it "should have ttr" do
-      serialized['ttr'].should eql(300)
+      expect(serialized['ttr']).to eql(300)
     end
   end
 
   describe "#deserialize" do
     it "should have args" do
-      deserialized.args[0].should eql(100)
-      deserialized.args[1].first_name.should eql('Brad')
+      expect(deserialized.args[0]).to eql(100)
+      expect(deserialized.args[1].first_name).to eql('Brad')
     end
 
     it "should have delay" do
-      deserialized.delay.should eql(2)
+      expect(deserialized.delay).to eql(2)
     end
 
     it "should have priority" do
-      deserialized.priority.should eql(1)
+      expect(deserialized.priority).to eql(1)
     end
 
     it "should have ttr" do
-      deserialized.ttr.should eql(300)
+      expect(deserialized.ttr).to eql(300)
     end
   end
 end

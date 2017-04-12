@@ -1,11 +1,13 @@
 require 'spec_helper'
 
 describe Controller::Base do
-  it "should perform job" do
-    Controller::Base.new(Adder.new(1,2)).perform.should eql(3)
+  it "performs a job" do
+    expect(
+      Controller::Base.new(Adder.new(1,2)).perform
+    ).to eql(3)
   end
 
-  it "should rescue all raised job actions" do
+  it "rescues all raised job actions" do
     [ReleaseJob, DeleteJob, BuryJob].each do |job|
       expect {
         Controller::Base.new(job.new).perform
@@ -24,69 +26,69 @@ describe Controller::Beanstalk do
     @q.drain!
   end
 
-  it "should delete job off queue after succesful run" do
+  it "deletes job off queue after succesful run" do
     @q.put Adder.new(1, 2)
-    @q.peek(:ready).should_not be_nil
-    @q.reserve.perform.should eql(3)
-    @q.peek(:ready).should be_nil
+    expect(@q.peek(:ready)).to_not be_nil
+    expect(@q.reserve.perform).to eql(3)
+    expect(@q.peek(:ready)).to be_nil
   end
 
-  it "should bury job if an exception occurs in job" do
+  it "buries job if an exception occurs in job" do
     @q.put Exceptional.new
-    @q.peek(:ready).should_not be_nil
-    expect { @q.reserve.perform }.to raise_exception
-    @q.peek(:buried).should_not be_nil
+    expect(@q.peek(:ready)).to_not be_nil
+    expect { @q.reserve.perform }.to raise_exception(RuntimeError, "Exceptional")
+    expect(@q.peek(:buried)).to_not be_nil
   end
 
-  it "should bury an AR job if an exception occurs deserializing it" do
+  it "buries an AR job if an exception occurs deserializing it" do
     tube = @q.send(:default_tube)
     tube.put({:foo => "bar"}.to_json)
-    tube.peek(:ready).should_not be_nil
-    expect { @q.reserve.perform }.to raise_exception
-    tube.peek(:buried).should_not be_nil
+    expect(tube.peek(:ready)).to_not be_nil
+    expect { @q.reserve.perform }.to raise_exception(NoMethodError)
+    expect(tube.peek(:buried)).to_not be_nil
   end
 
   context "job actions" do
-    it "should delete job" do
+    it "deletes a job" do
       @q.put DeleteJob.new
-      @q.peek(:ready).should_not be_nil
+      expect(@q.peek(:ready)).to_not be_nil
       @q.reserve.perform
-      @q.peek(:ready).should be_nil
+      expect(@q.peek(:ready)).to be_nil
     end
 
-    it "should release job" do
+    it "releases a job" do
       @q.put ReleaseJob.new
-      @q.peek(:ready).should_not be_nil
+      expect(@q.peek(:ready)).to_not be_nil
       @q.reserve.perform
-      @q.peek(:ready).should_not be_nil
+      expect(@q.peek(:ready)).to_not be_nil
     end
 
-    it "should bury job" do
+    it "buries a job" do
       @q.put BuryJob.new
-      @q.peek(:ready).should_not be_nil
-      @q.peek(:buried).should be_nil
+      expect(@q.peek(:ready)).to_not be_nil
+      expect(@q.peek(:buried)).to be_nil
       @q.reserve.perform
-      @q.peek(:ready).should be_nil
-      @q.peek(:buried).should_not be_nil
+      expect(@q.peek(:ready)).to be_nil
+      expect(@q.peek(:buried)).to_not be_nil
     end
   end
 
-  it "should retry a job with a delay and then bury" do
+  it "retries a job with a delay and then buries it" do
     TimeoutJob.backend = @q
     TimeoutJob.new.enqueue
-    @q.peek(:ready).should_not be_nil
+    expect(@q.peek(:ready)).to_not be_nil
     job = @q.reserve
-    job.beanstalk_job.stats["releases"].should eql(0)
-    job.beanstalk_job.stats["delay"].should eql(0)
+    expect(job.beanstalk_job.stats["releases"]).to eql(0)
+    expect(job.beanstalk_job.stats["delay"]).to eql(0)
     expect {
       job.perform
     }.to raise_exception(Quebert::Job::Timeout)
 
-    @q.peek(:ready).should be_nil
+    expect(@q.peek(:ready)).to be_nil
     beanstalk_job = @q.peek(:delayed)
-    beanstalk_job.should_not be_nil
-    beanstalk_job.stats["releases"].should eql(1)
-    beanstalk_job.stats["delay"].should eql(Quebert::Controller::Beanstalk::TIMEOUT_RETRY_GROWTH_RATE**beanstalk_job.stats["releases"])
+    expect(beanstalk_job).to_not be_nil
+    expect(beanstalk_job.stats["releases"]).to eql(1)
+    expect(beanstalk_job.stats["delay"]).to eql(Quebert::Controller::Beanstalk::TIMEOUT_RETRY_GROWTH_RATE**beanstalk_job.stats["releases"])
 
     sleep(3)
 
@@ -96,8 +98,8 @@ describe Controller::Beanstalk do
       @q.reserve.perform
     }.to raise_exception(Quebert::Job::Timeout)
 
-    @q.peek(:ready).should be_nil
-    @q.peek(:delayed).should be_nil
-    @q.peek(:buried).should_not be_nil
+    expect(@q.peek(:ready)).to be_nil
+    expect(@q.peek(:delayed)).to be_nil
+    expect(@q.peek(:buried)).to_not be_nil
   end
 end

@@ -8,26 +8,26 @@ describe Worker do
     end
   end
 
-  it "should start" do
+  it "starts" do
     @w.start
   end
 
   context "pluggable exception handler" do
-    it "should raise exception if nothing is provided" do
+    it "raises exception if nothing is provided" do
       @q.put Exceptional.new
-      lambda{ @w.start }.should raise_exception
+      expect { @w.start }.to raise_exception(RuntimeError, "Exceptional")
     end
 
-    it "should default to Quebert.config.worker.exception_handler handler" do
+    it "defaults to Quebert.config.worker.exception_handler handler" do
       @q.put Exceptional.new
-      Quebert.config.worker.exception_handler = Proc.new{|e, opts| e.should be_a(StandardError) }
-      lambda{ @w.start }.should_not raise_exception
+      Quebert.config.worker.exception_handler = Proc.new{|e, opts| expect(e).to be_a(StandardError) }
+      expect { @w.start }.to_not raise_exception
     end
 
-    it "should intercept exceptions" do
+    it "intercepts exceptions" do
       @q.put Exceptional.new
-      @w.exception_handler = Proc.new{|e, opts| e.should be_a(StandardError) }
-      lambda{ @w.start }.should_not raise_exception
+      @w.exception_handler = Proc.new{|e, opts| expect(e).to be_a(StandardError) }
+      expect { @w.start }.to_not raise_exception
     end
   end
 end
