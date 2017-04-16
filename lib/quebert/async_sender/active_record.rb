@@ -5,9 +5,11 @@ module Quebert
       class RecordJob < Job
         def perform(record, meth, *args)
           record.send(meth, *args)
+        ensure
+          ::ActiveRecord::Base.clear_active_connections!
         end
       end
-      
+
       def self.included(base)
         base.send(:include, AsyncSender::Promise::DSL)
         base.send(:include, AsyncSender::Object)
