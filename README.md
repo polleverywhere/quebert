@@ -6,15 +6,15 @@ Quebert is a ruby background worker library that works with the very fast and si
 
 ## Why Quebert?
 
-Because it has really low latency. Other Ruby queuing frameworks, like [DJ](https://github.com/collectiveidea/delayed_job) or [Resque](https://github.com/resque/resque), have to poll their queue servers periodicly. You could think of it as a "pull" queue. Quebert is a "push" queue. It maintains a persistent connection with beanstalkd and when is enqueud, its instantly pushed to the workers and executed.
+Because it has really low latency. Other Ruby queuing frameworks, like [DJ](https://github.com/collectiveidea/delayed_job) or [Resque](https://github.com/resque/resque), have to poll their queue servers periodicly. You could think of it as a "pull" queue. Quebert is a "push" queue. It maintains a persistent connection with beanstalkd and when is enqueued, it's instantly pushed to the workers and executed.
 
 [Sidekiq](http://sidekiq.org) uses Redis's "push" primitives so it has low latency, but it doesn't support class reloading in a development environment. Sidekiq is also threaded, which means there are no guarantees of reliability when running non-threadsafe code.
 
-[Backburner](https://github.com/nesquena/backburner) is very similar to Quebert. It offers more options for concurrency (threading, forking, etc.) than queubert but lacks pluggable back-ends, which means you'll be stubbing and mocking async calls.
+[Backburner](https://github.com/nesquena/backburner) is very similar to Quebert. It offers more options for concurrency (threading, forking, etc.) than Quebert but lacks pluggable back-ends, which means you'll be stubbing and mocking async calls.
 
 ## Who uses it?
 
-Quebert is a serious project. Its used in a production environment at [Poll Everywhere](https://www.polleverywhere.com/) to handle everything from SMS message processing to account downgrades.
+Quebert is a serious project. It's used in a production environment at [Poll Everywhere](https://www.polleverywhere.com/) to handle everything from SMS message processing to account downgrades.
 
 ## Features
 
