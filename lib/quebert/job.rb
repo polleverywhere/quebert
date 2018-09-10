@@ -10,7 +10,7 @@ module Quebert
 
     # Prioritize Quebert jobs as specified in https://github.com/kr/beanstalkd/blob/master/doc/protocol.txt.
     class Priority
-      LOW     = 2**32
+      LOW     = 2**32 - 1
       MEDIUM  = LOW / 2
       HIGH    = 0
     end
