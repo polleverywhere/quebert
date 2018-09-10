@@ -42,11 +42,11 @@ describe Quebert::Job do
   end
 
   describe "Quebert::Job::Priority" do
-    it "should have LOW priority of 4294967296" do
-      expect(Quebert::Job::Priority::LOW).to eql(4294967296)
+    it "should have LOW priority of 4294967295" do
+      expect(Quebert::Job::Priority::LOW).to eql(4294967295)
     end
     it "should have MEDIUM priority of 2147483648" do
-      expect(Quebert::Job::Priority::MEDIUM).to eql(2147483648)
+      expect(Quebert::Job::Priority::MEDIUM).to eql(2147483647)
     end
     it "should have HIGH priority of 0" do
       expect(Quebert::Job::Priority::HIGH).to eql(0)
