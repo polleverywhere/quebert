@@ -1,3 +1,7 @@
+## 3.2.1
+
+* Fix bug with low priority constant value
+
 ## 3.2.0
 
 * Add support for Beanstalk event hooks (#22)
