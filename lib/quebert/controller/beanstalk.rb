@@ -22,7 +22,7 @@ module Quebert
       end
 
       def perform
-        logger.error(job) { "Performing #{job.class.name} with args #{job.args.inspect}" }
+        logger.error(job) { "Performing #{job.class.name}." }
         logger.error(job) { "Beanstalk Job Stats: #{beanstalk_job.stats.inspect}" }
 
         result = false
