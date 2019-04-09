@@ -36,7 +36,7 @@ There are two ways to enqueue jobs with Quebert: through the Job itself, provide
 ### Supported Ruby Versions
 
 Quebert officially is supported to run on the currently supported versions of MRI.
-This includes versions >= `2.2.5`. Have a look at the `.travis.yml` configuration file to see all Ruby versions we support.
+This includes versions >= `2.4.3`. Have a look at the `.travis.yml` configuration file to see all Ruby versions we support.
 
 ### Jobs
 
