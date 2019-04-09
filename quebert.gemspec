@@ -8,8 +8,9 @@ Gem::Specification.new do |s|
   s.authors     = ["Brad Gessler", "Steel Fu", "Jeff Vyduna"]
   s.email       = ["brad@bradgessler.com"]
   s.homepage    = "http://github.com/polleverywhere/quebert"
-  s.summary     = %q{A worker queue framework built around beanstalkd}
-  s.description = %q{A worker queue framework built around beanstalkd}
+  s.summary     = %q{A worker queue framework built around beanstalkd.}
+  s.description = %q{Quebert is a worker queue framework built around beanstalkd. Use it in your Rails apps for job processing.}
+  s.license     = "MIT"
 
   s.rubyforge_project = "quebert"
 
