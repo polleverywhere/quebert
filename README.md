@@ -1,6 +1,6 @@
 # Quebert
 
-[![Build Status](https://travis-ci.org/polleverywhere/quebert.png?branch=master)](https://travis-ci.org/polleverywhere/quebert) [![Code Climate](https://codeclimate.com/github/polleverywhere/quebert/badges/gpa.svg)](https://codeclimate.com/github/polleverywhere/quebert)
+[![Build Status](https://travis-ci.org/polleverywhere/quebert.svg?branch=master)](https://travis-ci.org/polleverywhere/quebert) [![Code Climate](https://codeclimate.com/github/polleverywhere/quebert/badges/gpa.svg)](https://codeclimate.com/github/polleverywhere/quebert)
 
 Quebert is a ruby background worker library that works with the very fast and simple [beanstalkd](http://kr.github.io/beanstalkd/) deamon.
 
